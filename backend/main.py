@@ -1,6 +1,6 @@
 import pandas as pd
 from io import StringIO
-from backend.database import crear_nodos_en_neo4j,crear_relaciones_para_publ_Proy
+from backend.database import crear_nodos_en_neo4j,crear_relaciones_para_publ_Proy,crear_relaciones_para_Inv_Proy
 from backend.database import crear_nodo
 from py2neo import Graph, Node
 #Hola
@@ -30,6 +30,8 @@ def procesar_archivos(uploaded_files):
     crear_nodos_en_neo4j(nodos)
     return nodos
 
+
+
 def crear_nodo_publicaciones(titulo_publicacion, nombre_revista, anno_publicacion):
     # Crea un nodo de tipo "Publicaciones" con las propiedades especificadas
     nodo = Node("Publicaciones",
@@ -39,7 +41,28 @@ def crear_nodo_publicaciones(titulo_publicacion, nombre_revista, anno_publicacio
     crear_nodo(nodo)
     return nodo
 
-
+def procesar_relaciones(uploaded_files):
+    relaciones = []
+    for uploaded_file in uploaded_files:
+        if uploaded_file is not None:
+            # Leer el contenido del archivo CSV
+            csv_content = uploaded_file.read().decode("utf-8")
+            
+            # Crear un archivo temporal en memoria a partir del contenido
+            csv_file = StringIO(csv_content)
+            
+            # Leer las relaciones del archivo CSV
+            df = pd.read_csv(csv_file, skipinitialspace=True)
+            for _, row in df.iterrows():
+                relacion = {
+                    "idInv": row["idInv"],
+                    "idProy": row["idProy"]
+                }
+                relaciones.append(relacion)
+    
+    # Llamar a la función para crear relaciones en Neo4j
+    crear_relaciones_para_Inv_Proy(relaciones)
+    return relaciones
 
 def procesar_relaciones_entre_publ_Proy(uploaded_files):
     relaciones = []

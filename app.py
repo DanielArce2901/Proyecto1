@@ -82,7 +82,7 @@ def main():
                             st.success("Proyecto creado exitosamente.")
             
             elif operacion == "Actualizar":
-                idPry = st.text_input("ID del Proyecto a Actualizar:")
+                idPry = st.number_input("ID del Proyecto a Actualizar:",format="%d", value=0, step=1)
                 idPry=int(idPry)
                 if idPry:
                     verificador=verificar_proyecto_existente(idPry)
