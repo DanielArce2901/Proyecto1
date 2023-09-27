@@ -1,7 +1,5 @@
 from neo4j import GraphDatabase
-from py2neo import Graph, Node, Relationship
-import numpy as np
-
+from py2neo import Graph, Node,Relationship
 
 URI = "neo4j+s://1e46531c.databases.neo4j.io"
 AUTH = ("neo4j", "proyectoBases12")
@@ -13,7 +11,10 @@ def crear_nodos_en_neo4j(nodos):
         node = Node(tipo, **nodo)
         graph.create(node)
 
-
+def crear_nodo(nodo):
+    # Crea una conexión a la base de datos Neo4j
+    graph = Graph(URI, auth=AUTH)
+    
 def crear_relaciones_para_Inv_Proy(relaciones):
     graph = Graph(URI, auth=AUTH)
     for relacion in relaciones:
@@ -110,5 +111,7 @@ def actualizar_proyecto(idPry, proyecto_data):
 def visualizar_proyectos():
     return 0
 
+def crear_nodo():
+    return 0
 
-verificar_proyecto_existente(21)
+
