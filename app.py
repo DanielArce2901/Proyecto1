@@ -1,6 +1,7 @@
 import streamlit as st
 from backend.main import procesar_archivos
 from backend.main import procesar_relaciones,procesar_relaciones_entre_publ_Proy
+from backend.main import crear_nodo_publicaciones
 
 def main():
     st.title("Proyecto 1 Bases de datos Avanzadas")
@@ -36,9 +37,13 @@ def main():
             titulo = st.text_input("Ingrese Titulo")
             nombre = st.text_input("Ingrese el Nombre")
             anoPublicacion  = st.text_input("Ingrese el ano")
-            if(titulo and nombre and anoPublicacion):
-                st.write("Titulo:",titulo,"\n", "Nombre:", nombre,"\n", "Ano publicacion:",anoPublicacion)
-
+            if st.button("Crear publicacion"):
+                 if(titulo and nombre and anoPublicacion):
+                     crear_nodo_publicaciones(titulo, nombre, anoPublicacion)
+                     st.success("Se agrego la publicacion")
+                 else:
+                     st.warning("Faltan datos")
+            
         elif gestion_choice == "CRUD 2":
             st.subheader("CRUD 2")
             # Aquí puedes agregar el código para manejar el CRUD 2.
