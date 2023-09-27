@@ -111,7 +111,6 @@ def actualizar_proyecto(idPry, proyecto_data):
 def visualizar_proyectos():
     return 0
 
-def crear_nodo():
-    return 0
+
 
 

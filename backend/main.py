@@ -1,9 +1,10 @@
 import pandas as pd
 from io import StringIO
-#from backend.database import crear_nodos_en_neo4j
-#from backend.database import crear_nodo
+from backend.database import crear_nodos_en_neo4j,crear_relaciones_para_publ_Proy
+from backend.database import crear_nodo
 from py2neo import Graph, Node
-
+#Hola
+#cuanto cuestas mamacita?
 
 def procesar_archivos(uploaded_files):
     nodos = []
@@ -26,7 +27,7 @@ def procesar_archivos(uploaded_files):
                 for col in df.columns:
                     nodo[col] = row[col]
                 nodos.append(nodo)
-    #crear_nodos_en_neo4j(nodos)
+    crear_nodos_en_neo4j(nodos)
     return nodos
 
 def crear_nodo_publicaciones(titulo_publicacion, nombre_revista, anno_publicacion):
@@ -35,10 +36,10 @@ def crear_nodo_publicaciones(titulo_publicacion, nombre_revista, anno_publicacio
                 titulo_publicacion= titulo_publicacion,
                 nombre_revista= nombre_revista,
                 anno_publicacion= anno_publicacion)
-   # crear_nodo(nodo)
+    crear_nodo(nodo)
     return nodo
 
-    
+
 
 def procesar_relaciones_entre_publ_Proy(uploaded_files):
     relaciones = []
@@ -64,9 +65,11 @@ def procesar_relaciones_entre_publ_Proy(uploaded_files):
                 relaciones.append(relacion)
     
     # Llamar a la función para crear relaciones en Neo4j
-    #crear_relaciones_para_publ_Proy(relaciones)
+    crear_relaciones_para_publ_Proy(relaciones)
     return relaciones
 
 
 
+
+    
 
