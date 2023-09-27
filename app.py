@@ -1,5 +1,6 @@
 import streamlit as st
 from backend.main import procesar_archivos
+from backend.main import procesar_relaciones,procesar_relaciones_entre_publ_Proy
 
 def main():
     st.title("Proyecto 1 Bases de datos Avanzadas")
@@ -19,7 +20,6 @@ def main():
         if st.button("Cargar Datos"):
             if uploaded_files:
                 procesar_archivos(uploaded_files)  # Cargar nodos primero
-                #crear_relaciones(uploaded_files)  # Luego crear relaciones
                 st.success("Los datos se han cargado correctamente en Neo4j.")
             else:
                 st.warning("Por favor, suba los archivos CSV primero.")
@@ -48,12 +48,24 @@ def main():
             # Aquí puedes agregar el código para manejar el CRUD 3.
             
         elif gestion_choice == "Asociar Investigador":
-            st.subheader("Asociar Investigador")
-            # Aquí puedes agregar el código para manejar la asociación de investigadores.
+            st.subheader("Asociar Investigador a un proyecto")
+            uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
+            if st.button("Cargar Datos"):
+                if uploaded_files:
+                    procesar_relaciones(uploaded_files)  # Cargar nodos primero
+                    st.success("Los datos se han cargado correctamente en Neo4j.")
+                else:
+                    st.warning("Por favor, suba los archivos CSV primero.")
             
         elif gestion_choice == "Asociar Artículo":
             st.subheader("Asociar Artículo")
-            # Aquí puedes agregar el código para manejar la asociación de artículos.
+            uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
+            if st.button("Cargar Datos"):
+                if uploaded_files:
+                    procesar_relaciones_entre_publ_Proy(uploaded_files)  # Cargar nodos primero
+                    st.success("Los datos se han cargado correctamente en Neo4j.")
+                else:
+                    st.warning("Por favor, suba los archivos CSV primero.")
             
 if __name__ == "__main__":
     main()
