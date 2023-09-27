@@ -108,8 +108,22 @@ def actualizar_proyecto(idPry, proyecto_data):
 
 
 
-def visualizar_proyectos():
-    return 0
+def recuperar_proyectos_para_visualizar():
+    graph = Graph(URI, auth=AUTH)
+    query = "MATCH (p:Proyectos) RETURN p"
+    try:
+        resultados = graph.run(query).data()
+        proyectos = []
+        for resultado in resultados:
+            proyecto = resultado.get('p', {})
+            proyectos.append(proyecto)
+        return proyectos
+    except Exception as e:
+        print(f"Error al recuperar proyectos: {e}")
+        return []  # Retorna una lista vacía en caso de error
+
+
+
 
 
 

@@ -1,10 +1,12 @@
 import streamlit as st
+import pandas as pd
 from backend.main import procesar_archivos
 from backend.main import procesar_relaciones,procesar_relaciones_entre_publ_Proy
 
-from backend.database import verificar_proyecto_existente,crear_proyecto,actualizar_proyecto,visualizar_proyectos
+from backend.database import verificar_proyecto_existente,crear_proyecto,actualizar_proyecto,recuperar_proyectos_para_visualizar
 
 from backend.main import crear_nodo_publicaciones
+
 
 
 def main():
@@ -100,8 +102,18 @@ def main():
                         st.error("El proyecto con este ID no existe en la base de datos.")
             
             elif operacion == "Visualizar":
-                # Aquí puedes añadir el código para visualizar los proyectos
-                st.write("Visualizar Proyectos")
+                st.write("Proyectos:")
+                proyectos = recuperar_proyectos_para_visualizar()
+                df_proyectos = pd.DataFrame(proyectos)
+                df_proyectos.rename(columns={
+                    'anno_inicio': 'Año de Inicio',
+                    'area_conocimiento': 'Área de Conocimiento',
+                    'duracion_meses': 'Duración (meses)',
+                    'idPry': 'ID del Proyecto',
+                    'titulo_proyecto': 'Título del Proyecto'
+                }, inplace=True)
+                st.title('Lista de Proyectos')
+                st.table(df_proyectos)
 
                         
             
