@@ -32,9 +32,13 @@ def main():
         gestion_choice = st.sidebar.selectbox("Gestión de Datos", gestion_menu)
         
         if gestion_choice == "CRUD 1":
-            st.subheader("CRUD 1")
-            # Aquí puedes agregar el código para manejar el CRUD 1.
-            
+            st.subheader("Crear publicacion")
+            titulo = st.text_input("Ingrese Titulo")
+            nombre = st.text_input("Ingrese el Nombre")
+            anoPublicacion  = st.text_input("Ingrese el ano")
+            if(titulo and nombre and anoPublicacion):
+                st.write("Titulo:",titulo,"\n", "Nombre:", nombre,"\n", "Ano publicacion:",anoPublicacion)
+
         elif gestion_choice == "CRUD 2":
             st.subheader("CRUD 2")
             # Aquí puedes agregar el código para manejar el CRUD 2.

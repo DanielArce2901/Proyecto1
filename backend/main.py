@@ -1,6 +1,7 @@
 import pandas as pd
 from io import StringIO
 from backend.database import crear_nodos_en_neo4j
+from py2neo import Graph, Node
 #Hola
 #cuanto cuestas mamacita?
 
@@ -27,3 +28,5 @@ def procesar_archivos(uploaded_files):
                 nodos.append(nodo)
     crear_nodos_en_neo4j(nodos)
     return nodos
+
+
