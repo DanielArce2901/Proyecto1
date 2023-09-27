@@ -84,3 +84,31 @@ def verificar_nodos_Plu_Proy(graph, idPubl, idProy):
     return publicacion is not None and proyecto is not None
 
 
+def verificar_proyecto_existente(idPry):
+    graph = Graph(URI, auth=AUTH)
+    proyecto = graph.nodes.match("Proyectos", idPry=idPry).first()
+    if proyecto==None:
+        return False 
+    else:
+        return True
+
+def crear_proyecto(proyecto_data):
+    graph = Graph(URI, auth=AUTH)
+    proyecto = Node("Proyectos", **proyecto_data)
+    graph.create(proyecto)
+    
+def actualizar_proyecto(idPry, proyecto_data):
+    graph = Graph(URI, auth=AUTH)
+    proyecto = graph.nodes.match("Proyectos", idPry=idPry).first()
+    if proyecto:
+        proyecto.update(**proyecto_data)
+        graph.push(proyecto)
+
+
+
+
+def visualizar_proyectos():
+    return 0
+
+
+verificar_proyecto_existente(21)
