@@ -19,7 +19,177 @@ def main():
     
     if choice == "Consultas":
         st.subheader("Sección de Consultas")
-        # Aquí puedes agregar el código para manejar las consultas.
+        opcionInicio = st.selectbox('¿Seleccione lo que desea consultar?', ["Buscar Investigador", "Buscar Proyecto","Buscar Publicacion","Buscar area de conocimiento","Busqueda por Colegas"])
+        if (opcionInicio=="Buscar Investigador"):
+            investigador=recuperar_Investigadores_para_visualizar()
+            with investigador:
+                try:
+                    inv=recuperar_Investigadores_para_visualizar()
+                    opciones=[]
+                    for a in inv:
+                        opciones.append(a)
+                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+
+                    #conseguir los datos de la persona
+                    perfil=[]
+
+
+                    # Cuadros de texto para capturar datos
+                    st.write("ID:",perfil[3])
+                    st.write("Nombre:",perfil[0])
+                    st.write("Institución:",perfil[1])
+                    st.write("Título:",perfil[2])
+                    st.write("Email:",perfil[4])
+                    
+                    data = {
+                        'Titulo':general[0],
+                        'Duracion meses':general[1],
+                        'Area de Conocimiento':general[2],
+                        'Año':general[3],
+                        'ID':general[4]
+                    }
+
+                    df = pd.DataFrame(data)
+                    # Título de la aplicación
+                    st.title("Proyectos de Investigador")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df)
+                    
+                except:
+                    st.warning("No hay datos cargados")
+
+
+        if (opcionInicio=="Buscar Proyecto"):
+            proyecto=recuperar_proyectos_para_visualizar()
+            with proyecto:
+                try:
+                    inv=recuperar_proyectos_para_visualizar()
+                    opciones=[]
+                    for a in inv:
+                        opciones.append(a)
+                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+
+                    #conseguir los datos de la persona
+                    perfil=[]
+
+                    # Cuadros de texto para capturar datos
+                    st.write("ID:",perfil[4])
+                    st.write("Titulo:",perfil[0])
+                    st.write("Meses:",perfil[1])
+                    st.write("Area de conocimiento:",perfil[2])
+                    st.write("Año:",perfil[3])
+
+                    
+                    data = {
+                        'ID':general[4],
+                        'Nombre':general[0],
+                        'Titulo academico':general[1],
+                        'Institucion':general[2],
+                        'Email':general[3]
+                    }
+
+                    
+
+                    df = pd.DataFrame(data)
+                    # Título de la aplicación
+                    st.title("Investigadores del Proyecto")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df)
+                    
+
+                    # Título 2
+                    st.title("Publicaciones del Proyecto")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df_2)
+
+                except:
+                    st.warning("No hay datos cargados")
+
+
+        if (opcionInicio=="Buscar Publicacion"):
+            publicacion=recuperar_Publicaciones_para_visualizar()
+            with publicacion:
+                try:
+                    inv=recuperar_Publicaciones_para_visualizar()
+                    opciones=[]
+                    for a in inv:
+                        opciones.append(a)
+                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+
+                    #conseguir los datos de la persona
+                    perfil=[]
+
+                    # Cuadros de texto para capturar datos
+                    st.write("ID:",perfil[2])
+                    st.write("Titulo:",perfil[0])
+                    st.write("Nombre:",perfil[1])
+                    st.write("Año:",perfil[3])
+                    general=recuperar_Publicaciones_para_visualizar()
+                    st.write("Proyecto Asociado:",general[0])
+
+                except:
+                    st.warning("No hay datos cargados")
+
+        if (opcionInicio=="Buscar area de conocimiento"):
+                try:
+                    inv=retornar_areas_conocimiento()
+                    opciones=[]
+                    for a in inv:
+                        opciones.append(a)
+                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+                    
+                    st.write("Area de conocimiento: ",seleccion)
+                    #general=cc.retornar_proyectos_conocimiento(seleccion)
+                    #general_2=cc.retornar_articulos_conocimiento(seleccion)
+                    data = {
+                        'Titulos Proyectos':general,
+                    }
+
+                    data2 = {
+                        #'Titulos Articulos':general_2,
+                    }
+                    df = pd.DataFrame(data)
+                    df_2= pd.DataFrame(data2)
+                    
+                    # Título de la aplicación
+                    st.write("Proyectos del area de conocimiento")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df)
+
+                    # Título 2
+                    st.write("Articulos del area de conocimiento")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df_2)
+
+                except:
+                    st.warning("No hay datos cargados")
+
+        if (opcionInicio=="Busqueda por Colegas"):
+           # with area:
+                try:
+                    inv=recuperar_Investigadores_para_visualizar()
+                    opciones=[]
+                    for a in inv:
+                        opciones.append(a)
+                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+                    
+                    st.write("ID:",general[3])
+                    st.write("Nombre:",general[0])
+                    st.write("Institución:",general[1])
+                    st.write("Título:",general[2])
+                    st.write("Email:",general[4])
+
+                    data = {
+                        #'Nombre Colegas':general_2
+                    }
+                    df = pd.DataFrame(data)                
+                    # Título de la aplicación
+                    st.title("Colegas")
+                    # Mostrar el DataFrame en Streamlit
+                    st.dataframe(df)
+                            
+                except:
+                    st.warning("No hay datos cargados")
         
     elif choice == "Subir Datos":
         st.subheader("Sección para Subir Datos")
@@ -94,13 +264,17 @@ def main():
             operacion = st.selectbox("Seleccione una operación:", ["Crear", "Actualizar", "Visualizar"])
             
             if operacion == "Crear":
-                registrarInvestigador(base)
+                #registrarInvestigador(base)
+                st.write("Proyectos:")
             
             elif operacion == "Actualizar":
-                modificarInvestigador(base)
+                #modificarInvestigador(base)
+                st.write("Proyectos:")
+                
             
             elif operacion == "Visualizar":
-                mostrarInvestigador(base)
+                #mostrarInvestigador(base)
+                st.write("Proyectos:")
             
         elif gestion_choice == "Gestión de proyectos":
             st.subheader("Proyectos")
