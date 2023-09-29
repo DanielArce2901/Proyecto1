@@ -16,180 +16,147 @@ def main():
     # Crear el menú principal
     menu = ["Consultas", "Subir Datos", "Gestión de Datos"]
     choice = st.sidebar.selectbox("Menú", menu)
-    
     if choice == "Consultas":
         st.subheader("Sección de Consultas")
         opcionInicio = st.selectbox('¿Seleccione lo que desea consultar?', ["Buscar Investigador", "Buscar Proyecto","Buscar Publicacion","Buscar area de conocimiento","Busqueda por Colegas"])
+        investigador=recuperar_Investigadores_para_visualizar()
+        df_investigador = pd.DataFrame(investigador)
+        proyecto=recuperar_proyectos_para_visualizar()
+        df_proyecto = pd.DataFrame(proyecto)
+        publicacion=recuperar_Publicaciones_para_visualizar()
+        df_publicacion = pd.DataFrame(publicacion)
         if (opcionInicio=="Buscar Investigador"):
-            investigador=recuperar_Investigadores_para_visualizar()
-            with investigador:
-                try:
-                    inv=recuperar_Investigadores_para_visualizar()
-                    opciones=[]
-                    for a in inv:
-                        opciones.append(a)
-                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+            st.title('Búsqueda de un Investigador')
+            relacion_inv_pry=recuperar_relaciones_proyectos_investigadores()
+            df_relacion_inv_pry= pd.DataFrame(relacion_inv_pry)
+            data = []
+            for item in relacion_inv_pry:
+                investigador = item['investigador']
+                proyecto = item['proyecto']
+                data.append({
+                    'id': investigador['id'],
+                    'idPry': proyecto['idPry'],
+                    'nombre_completo': investigador['nombre_completo'],
+                    'email': investigador['email'],
+                    'institucion': investigador['institucion'],
+                    'titulo_academico': investigador['titulo_academico'],
+                    'titulo_proyecto': proyecto['titulo_proyecto'],
+                    'anno_inicio': proyecto['anno_inicio'],
+                    'area_conocimiento': proyecto['area_conocimiento'],
+                    'duracion_meses': proyecto['duracion_meses'],
+                })
 
-                    #conseguir los datos de la persona
-                    perfil=[]
+            df_relacion_inv_pry = pd.DataFrame(data)
+            # Crear un widget de selección con los nombres de los investigadores
+            selected_investigator = st.selectbox('Selecciona un investigador:', df_investigador['nombre_completo'].tolist())
+            
+            # Filtrar el DataFrame de investigadores basado en la selección del usuario
+            selected_investigator_data = df_investigador[df_investigador['nombre_completo'] == selected_investigator]
+            
+            # Mostrar los datos del investigador seleccionado
+            st.subheader('Datos del Investigador Seleccionado')
+            st.write(selected_investigator_data)
+            
+            # Verificar si df_relacion_inv_pry está vacío
+            if not df_relacion_inv_pry.empty:
+                # Obtener y mostrar los proyectos asociados al investigador seleccionado
+                st.subheader('Proyectos Asociados')
+                proyectos_ids = df_relacion_inv_pry[df_relacion_inv_pry['id'] == selected_investigator_data.iloc[0]['id']]['idPry'].tolist()
+                proyectos_asociados = df_proyecto[df_proyecto['idPry'].isin(proyectos_ids)]
+                st.write(proyectos_asociados)
+            else:
+                st.warning('Este investigador no está asociado a ningún proyecto.')
 
-
-                    # Cuadros de texto para capturar datos
-                    st.write("ID:",perfil[3])
-                    st.write("Nombre:",perfil[0])
-                    st.write("Institución:",perfil[1])
-                    st.write("Título:",perfil[2])
-                    st.write("Email:",perfil[4])
-                    
-                    data = {
-                        'Titulo':general[0],
-                        'Duracion meses':general[1],
-                        'Area de Conocimiento':general[2],
-                        'Año':general[3],
-                        'ID':general[4]
-                    }
-
-                    df = pd.DataFrame(data)
-                    # Título de la aplicación
-                    st.title("Proyectos de Investigador")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df)
-                    
-                except:
-                    st.warning("No hay datos cargados")
+                
 
 
         if (opcionInicio=="Buscar Proyecto"):
-            proyecto=recuperar_proyectos_para_visualizar()
-            with proyecto:
-                try:
-                    inv=recuperar_proyectos_para_visualizar()
-                    opciones=[]
-                    for a in inv:
-                        opciones.append(a)
-                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+            st.title('Búsqueda de un Proyecto')
+            data = []
+            for item in relacion_inv_pry:
+                investigador = item['investigador']
+                proyecto = item['proyecto']
+                data.append({
+                    'id': investigador['id'],
+                    'idPry': proyecto['idPry'],
+                    'nombre_completo': investigador['nombre_completo'],
+                    'email': investigador['email'],
+                    'institucion': investigador['institucion'],
+                    'titulo_academico': investigador['titulo_academico'],
+                    'titulo_proyecto': proyecto['titulo_proyecto'],
+                    'anno_inicio': proyecto['anno_inicio'],
+                    'area_conocimiento': proyecto['area_conocimiento'],
+                    'duracion_meses': proyecto['duracion_meses'],
+                })
 
-                    #conseguir los datos de la persona
-                    perfil=[]
+            df_relacion_inv_pry = pd.DataFrame(data)
 
-                    # Cuadros de texto para capturar datos
-                    st.write("ID:",perfil[4])
-                    st.write("Titulo:",perfil[0])
-                    st.write("Meses:",perfil[1])
-                    st.write("Area de conocimiento:",perfil[2])
-                    st.write("Año:",perfil[3])
 
-                    
-                    data = {
-                        'ID':general[4],
-                        'Nombre':general[0],
-                        'Titulo academico':general[1],
-                        'Institucion':general[2],
-                        'Email':general[3]
-                    }
 
-                    
+            # Crear un widget de selección con los nombres de los proyectos
+            selected_project = st.selectbox('Selecciona un proyecto:', df_proyecto['titulo_proyecto'].tolist())
 
-                    df = pd.DataFrame(data)
-                    # Título de la aplicación
-                    st.title("Investigadores del Proyecto")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df)
-                    
+            # Filtrar el DataFrame de proyectos basado en la selección del usuario
+            selected_project_data = df_proyecto[df_proyecto['titulo_proyecto'] == selected_project]
 
-                    # Título 2
-                    st.title("Publicaciones del Proyecto")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df_2)
-
-                except:
-                    st.warning("No hay datos cargados")
+            # Mostrar los datos del proyecto seleccionado
+            st.subheader('Datos del Proyecto Seleccionado')
+            st.write(selected_project_data)
+            if not df_relacion_inv_pry.empty:
+                # Obtener y mostrar los investigadores asociados al proyecto seleccionado
+                st.subheader('Investigadores Asociados')
+                investigadores_ids = df_relacion_inv_pry[df_relacion_inv_pry['idPry'] == selected_project_data.iloc[0]['idPry']]['id'].tolist()
+                investigadores_asociados = df_investigador[df_investigador['id'].isin(investigadores_ids)]
+                st.write(investigadores_asociados)
+            else:
+                st.warning('No hay investigadores asociados a este proyecto.')
 
 
         if (opcionInicio=="Buscar Publicacion"):
-            publicacion=recuperar_Publicaciones_para_visualizar()
-            with publicacion:
-                try:
-                    inv=recuperar_Publicaciones_para_visualizar()
-                    opciones=[]
-                    for a in inv:
-                        opciones.append(a)
-                    seleccion = st.selectbox("Selecciona una opción:", opciones)
+            st.title('Búsqueda de una Publicación')
+            relacion_plu_pry=recuperar_relaciones_proyectos_publicaciones()
+            df_relacion_plu_pry= pd.DataFrame(relacion_plu_pry)
+            # Crear un DataFrame para las relaciones entre proyectos y publicaciones
+            data = []
+            for item in relacion_plu_pry:
+                publicacion = item['publicacion']
+                proyecto = item['proyecto']
+                data.append({
+                    'idPub': publicacion['idPub'],
+                    'idPry': proyecto['idPry'],
+                    'titulo_publicacion': publicacion['titulo_publicacion'],
+                    'fecha_publicacion': publicacion['fecha_publicacion'],
+                    'resumen': publicacion['resumen'],
+                    'palabras_clave': publicacion['palabras_clave'],
+                    'titulo_proyecto': proyecto['titulo_proyecto'],
+                    'anno_inicio': proyecto['anno_inicio'],
+                    'area_conocimiento': proyecto['area_conocimiento'],
+                    'duracion_meses': proyecto['duracion_meses'],
+                })
 
-                    #conseguir los datos de la persona
-                    perfil=[]
+            df_relacion_plu_pry = pd.DataFrame(data)
 
-                    # Cuadros de texto para capturar datos
-                    st.write("ID:",perfil[2])
-                    st.write("Titulo:",perfil[0])
-                    st.write("Nombre:",perfil[1])
-                    st.write("Año:",perfil[3])
-                    general=recuperar_Publicaciones_para_visualizar()
-                    st.write("Proyecto Asociado:",general[0])
+            # Crear un widget de selección con los títulos de las publicaciones
+            selected_publications = st.multiselect('Selecciona una o más publicaciones:', df_publicacion['titulo_publicacion'].tolist())
 
-                except:
-                    st.warning("No hay datos cargados")
+            for selected_publication in selected_publications:
+                # Filtrar el DataFrame de publicaciones basado en la selección del usuario
+                selected_publication_data = df_publicacion[df_publicacion['titulo_publicacion'] == selected_publication]
 
-        if (opcionInicio=="Buscar area de conocimiento"):
-                try:
-                    inv=retornar_areas_conocimiento()
-                    opciones=[]
-                    for a in inv:
-                        opciones.append(a)
-                    seleccion = st.selectbox("Selecciona una opción:", opciones)
-                    
-                    st.write("Area de conocimiento: ",seleccion)
-                    #general=cc.retornar_proyectos_conocimiento(seleccion)
-                    #general_2=cc.retornar_articulos_conocimiento(seleccion)
-                    data = {
-                        'Titulos Proyectos':general,
-                    }
+                # Mostrar los datos de la publicación seleccionada
+                st.subheader('Datos de la Publicación Seleccionada')
+                st.write(selected_publication_data)
 
-                    data2 = {
-                        #'Titulos Articulos':general_2,
-                    }
-                    df = pd.DataFrame(data)
-                    df_2= pd.DataFrame(data2)
-                    
-                    # Título de la aplicación
-                    st.write("Proyectos del area de conocimiento")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df)
+                if not df_relacion_plu_pry.empty:
+                    # Obtener y mostrar los proyectos asociados a la publicación seleccionada
+                    st.subheader('Proyecto Asociado')
+                    proyectos_ids = df_relacion_plu_pry[df_relacion_plu_pry['idPub'] == selected_publication_data.iloc[0]['idPub']]['idPry'].tolist()
+                    proyectos_asociados = df_proyecto[df_proyecto['idPry'].isin(proyectos_ids)]
+                    st.write(proyectos_asociados)
+                else:
+                    st.warning('No hay proyectos asociados a esta publicación.')
 
-                    # Título 2
-                    st.write("Articulos del area de conocimiento")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df_2)
 
-                except:
-                    st.warning("No hay datos cargados")
-
-        if (opcionInicio=="Busqueda por Colegas"):
-           # with area:
-                try:
-                    inv=recuperar_Investigadores_para_visualizar()
-                    opciones=[]
-                    for a in inv:
-                        opciones.append(a)
-                    seleccion = st.selectbox("Selecciona una opción:", opciones)
-                    
-                    st.write("ID:",general[3])
-                    st.write("Nombre:",general[0])
-                    st.write("Institución:",general[1])
-                    st.write("Título:",general[2])
-                    st.write("Email:",general[4])
-
-                    data = {
-                        #'Nombre Colegas':general_2
-                    }
-                    df = pd.DataFrame(data)                
-                    # Título de la aplicación
-                    st.title("Colegas")
-                    # Mostrar el DataFrame en Streamlit
-                    st.dataframe(df)
-                            
-                except:
-                    st.warning("No hay datos cargados")
         
     elif choice == "Subir Datos":
         st.subheader("Sección para Subir Datos")
@@ -206,10 +173,10 @@ def main():
         st.subheader("Sección de Gestión de Datos")
         
         # Crear el submenú para Gestión de Datos
-        gestion_menu = ["CRUD 1", "CRUD 2", "Gestión de proyectos", "Asociar Investigador", "Asociar Artículo"]
+        gestion_menu = ["Gestion de Publicaciones", "Gestion de Investigadores", "Gestión de proyectos", "Asociar Investigador", "Asociar Artículo"]
         gestion_choice = st.sidebar.selectbox("Gestión de Datos", gestion_menu)
         
-        if gestion_choice == "CRUD 1":
+        if gestion_choice == "Gestion de Publicaciones":
 
             st.subheader("Publicaciones")
             # Aquí puedes agregar el código para manejar el CRUD 1.
@@ -259,8 +226,8 @@ def main():
                         st.write("ID:", nodo.identity, "Propiedades:",dict(nodo))
 
             
-        elif gestion_choice == "CRUD 2":
-            st.subheader("CRUD 2")
+        elif gestion_choice == "Gestion de Investigadores":
+            st.subheader("Investigadores")
             operacion = st.selectbox("Seleccione una operación:", ["Crear", "Actualizar", "Visualizar"])
             
             if operacion == "Crear":
