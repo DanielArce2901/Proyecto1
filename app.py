@@ -2,9 +2,7 @@ import streamlit as st
 import pandas as pd
 from backend.main import procesar_archivos
 from backend.main import procesar_relaciones,procesar_relaciones_entre_publ_Proy
-from Investigador import Investigador
 from backend.database import *
-from CRUDInvestigador import *
 from backend.main import crear_nodo_publicaciones
 
 

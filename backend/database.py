@@ -1,6 +1,5 @@
 from neo4j import GraphDatabase
 from py2neo import Graph, Node,Relationship
-from Investigador import Investigador
 URI = "neo4j+s://1e46531c.databases.neo4j.io"
 AUTH = ("neo4j", "proyectoBases12")
 
