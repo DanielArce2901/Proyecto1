@@ -70,6 +70,8 @@ def main():
 
         if (opcionInicio=="Buscar Proyecto"):
             st.title('Búsqueda de un Proyecto')
+            relacion_inv_pry=recuperar_relaciones_proyectos_investigadores()
+            df_relacion_inv_pry= pd.DataFrame(relacion_inv_pry)
             data = []
             for item in relacion_inv_pry:
                 investigador = item['investigador']
@@ -158,14 +160,36 @@ def main():
         
     elif choice == "Subir Datos":
         st.subheader("Sección para Subir Datos")
-        uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
+        uploaded_file = st.file_uploader("Subir archivo CSV", type=["csv"])  # Aceptar solo un archivo
         
         if st.button("Cargar Datos"):
-            if uploaded_files:
-                procesar_archivos(uploaded_files)  # Cargar nodos primero
-                st.success("Los datos se han cargado correctamente en Neo4j.")
+            if uploaded_file:
+                # Leer el archivo CSV y convertirlo en un DataFrame
+                df = pd.read_csv(uploaded_file)
+                
+                # Definir los formatos esperados para cada tipo de nodo
+                formatos = {
+                    'Proyectos': {'idPry', 'titulo_proyecto', 'anno_inicio', 'duracion_meses', 'area_conocimiento'},
+                    'Publicaciones': {'idPub', 'titulo_publicacion', 'anno_publicacion', 'nombre_revista'},
+                    'Investigadores': {'id', 'nombre_completo', 'titulo_academico', 'institucion', 'email'}
+                }
+                
+                # Verificar el formato del archivo subido
+                formato_correcto = False
+                for tipo, formato in formatos.items():
+                    if set(df.columns) == formato:
+                        formato_correcto = True
+                        break
+                
+                if not formato_correcto:
+                    st.error("El archivo subido no tiene el formato correcto. Por favor, sube un archivo CSV válido.")
+                else:
+                    # Si el archivo tiene el formato correcto, procede a procesarlo
+                    procesar_archivos(uploaded_file)
+                    st.success("Los datos se han cargado correctamente en Neo4j.")
             else:
-                st.warning("Por favor, suba los archivos CSV primero.")
+                st.warning("Por favor, suba el archivo CSV primero.")
+
                 
     elif choice == "Gestión de Datos":
         st.subheader("Sección de Gestión de Datos")
@@ -301,27 +325,57 @@ def main():
                 st.title('Lista de Proyectos')
                 st.table(df_proyectos)
 
-                        
-            
         elif gestion_choice == "Asociar Investigador":
             st.subheader("Asociar Investigador a un proyecto")
             uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
             if st.button("Cargar relaciones"):
                 if uploaded_files:
-                    procesar_relaciones(uploaded_files)  # Cargar nodos primero
-                    st.success("Los datos se han cargado correctamente en Neo4j.")
+                    for uploaded_file in uploaded_files:
+                        # Leer el archivo CSV y convertirlo en un DataFrame
+                        df = pd.read_csv(uploaded_file)
+                        
+                        # Verificar si el DataFrame tiene las columnas correctas
+                        if set(df.columns) != {'idInv', 'idProy'}:
+                            st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
+                            continue  # Pasar al siguiente archivo, si hay más
+                        
+                        # Verificar si los valores en las columnas son numéricos
+                        if not (df['idInv'].apply(lambda x: str(x).isnumeric()).all() and df['idProy'].apply(lambda x: str(x).isnumeric()).all()):
+                            st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
+                            continue  # Pasar al siguiente archivo, si hay más
+                        
+                        # Procesar las relaciones si todo está bien
+                        procesar_relaciones(uploaded_file)
+                        st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
                 else:
                     st.warning("Por favor, suba los archivos CSV primero.")
+
             
         elif gestion_choice == "Asociar Artículo":
             st.subheader("Asociar Artículo")
             uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
             if st.button("Cargar relaciones"):
                 if uploaded_files:
-                    procesar_relaciones_entre_publ_Proy(uploaded_files)  # Cargar nodos primero
-                    st.success("Los datos se han cargado correctamente en Neo4j.")
+                    for uploaded_file in uploaded_files:
+                        # Leer el archivo CSV y convertirlo en un DataFrame
+                        df = pd.read_csv(uploaded_file)
+                        
+                        # Verificar si el DataFrame tiene las columnas correctas
+                        if set(df.columns) != {'idProyecto', 'idArt'}:
+                            st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
+                            continue  # Pasar al siguiente archivo, si hay más
+                        
+                        # Verificar si los valores en las columnas son numéricos
+                        if not (df['idProyecto'].apply(lambda x: str(x).isnumeric()).all() and df['idArt'].apply(lambda x: str(x).isnumeric()).all()):
+                            st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
+                            continue  # Pasar al siguiente archivo, si hay más
+                        
+                        # Procesar las relaciones si todo está bien
+                        procesar_relaciones_entre_publ_Proy(uploaded_file)
+                        st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
                 else:
                     st.warning("Por favor, suba los archivos CSV primero.")
+
             
 if __name__ == "__main__":
     main()
