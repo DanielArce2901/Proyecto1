@@ -160,7 +160,7 @@ def crear_publicacion(datos_publicacion):
     graph.create(publicacion)
 
 
-
+#erc
 
 class DataBase:
     #Método constructor
