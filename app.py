@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 from backend.main import procesar_archivos
 from backend.main import procesar_relaciones,procesar_relaciones_entre_publ_Proy
-
-from backend.database import verificar_proyecto_existente,crear_proyecto,actualizar_proyecto,recuperar_proyectos_para_visualizar
-
+from Investigador import Investigador
+from backend.database import *
+from CRUDInvestigador import *
 from backend.main import crear_nodo_publicaciones
+
 
 
 
@@ -40,24 +41,66 @@ def main():
         
         if gestion_choice == "CRUD 1":
 
-            st.subheader("CRUD 1")
+            st.subheader("Publicaciones")
             # Aquí puedes agregar el código para manejar el CRUD 1.
+            opcion= st.selectbox("Seleccione la opcion:", ["Crear","Actualizar", "Visualizar"])
 
-            st.subheader("Crear publicacion")
-            titulo = st.text_input("Ingrese Titulo")
-            nombre = st.text_input("Ingrese el Nombre")
-            anoPublicacion  = st.text_input("Ingrese el ano")
-            if st.button("Crear publicacion"):
-                 if(titulo and nombre and anoPublicacion):
-                     crear_nodo_publicaciones(titulo, nombre, anoPublicacion)
-                     st.success("Se agrego la publicacion")
-                 else:
-                     st.warning("Faltan datos")
+            if opcion == "Crear":
+                datos = {
+                    "idPub": st.number_input("ID de la publicacion:", format= "%d", value=0, step = 1),
+                    "titulo_publicacion": st.text_input("Titulo de la publicacion"),
+                    "nombre_revista": st.text_input("Nombre de la revista"),
+                    "anno_publicacion": st.number_input("Año de publicacion:", format= "%d", value=0, step = 1)
+                }
+                idPub = int(datos["idPub"])
+                if idPub:  # Verificar si el usuario ha ingresado un ID del proyecto
+                    verificador=verificar_publicaciones_existente(idPub)
+                    if  verificador==True:
+                        st.warning("Ya existe una publicacion con ese ID.")
+                    else:
+                        if st.button("Crear Publicacion"):
+                            crear_publicacion(datos)
+                            st.success("Publicacion creada")
+
+            elif opcion == "Actualizar":
+
+                idPub = st.number_input("ID de la publicacion:", format= "%d", value=0, step = 1)
+                idPub = int(idPub)
+                if idPub:
+                    verificador = verificar_publicaciones_existente(idPub)
+                    if verificador == True:
+                        datos = {
+                        "titulo_publicacion": st.text_input("Titulo de la publicacion"),
+                        "nombre_revista": st.text_input("Nombre de la revista"),
+                        "anno_publicacion": st.number_input("Año publicacion", format= "%d", value=0, step = 1)
+                        }
+                        if st.button("actualizar publicacion"):
+                            actualizar_publicacion(idPub, datos)
+                            st.success("Actualizacion realizada")
+                    else:
+                        st.warning("No se encontro el ID")
+            
+            elif opcion == "Visualizar":
+                st.subheader("Publicaciones almacenadas")
+                if st.button("Mostrar publicaciones"):
+                    resultados = obtener_nodos()
+                    for resultado in resultados:
+                        nodo = resultado["n"]
+                        st.write("ID:", nodo.identity, "Propiedades:",dict(nodo))
 
             
         elif gestion_choice == "CRUD 2":
             st.subheader("CRUD 2")
-            # Aquí puedes agregar el código para manejar el CRUD 2.
+            operacion = st.selectbox("Seleccione una operación:", ["Crear", "Actualizar", "Visualizar"])
+            
+            if operacion == "Crear":
+                registrarInvestigador(base)
+            
+            elif operacion == "Actualizar":
+                modificarInvestigador(base)
+            
+            elif operacion == "Visualizar":
+                mostrarInvestigador(base)
             
         elif gestion_choice == "Gestión de proyectos":
             st.subheader("Proyectos")
@@ -80,8 +123,11 @@ def main():
                         st.warning("El proyecto con este ID ya existe en la base de datos.")
                     else:
                         if st.button("Crear Proyecto"):
-                            crear_proyecto(proyecto_data)
-                            st.success("Proyecto creado exitosamente.")
+                            if proyecto_data["titulo_proyecto"] and proyecto_data["area_conocimiento"]:
+                                crear_proyecto(proyecto_data)
+                                st.success("Proyecto creado exitosamente.")
+                            else:
+                                st.warning("Faltan datos.")
             
             elif operacion == "Actualizar":
                 idPry = st.number_input("ID del Proyecto a Actualizar:",format="%d", value=0, step=1)
@@ -104,6 +150,7 @@ def main():
             elif operacion == "Visualizar":
                 st.write("Proyectos:")
                 proyectos = recuperar_proyectos_para_visualizar()
+                print (proyectos)
                 df_proyectos = pd.DataFrame(proyectos)
                 df_proyectos.rename(columns={
                     'anno_inicio': 'Año de Inicio',
@@ -120,7 +167,7 @@ def main():
         elif gestion_choice == "Asociar Investigador":
             st.subheader("Asociar Investigador a un proyecto")
             uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
-            if st.button("Cargar Datos"):
+            if st.button("Cargar relaciones"):
                 if uploaded_files:
                     procesar_relaciones(uploaded_files)  # Cargar nodos primero
                     st.success("Los datos se han cargado correctamente en Neo4j.")
@@ -130,7 +177,7 @@ def main():
         elif gestion_choice == "Asociar Artículo":
             st.subheader("Asociar Artículo")
             uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
-            if st.button("Cargar Datos"):
+            if st.button("Cargar relaciones"):
                 if uploaded_files:
                     procesar_relaciones_entre_publ_Proy(uploaded_files)  # Cargar nodos primero
                     st.success("Los datos se han cargado correctamente en Neo4j.")

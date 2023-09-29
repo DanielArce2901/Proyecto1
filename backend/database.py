@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 from py2neo import Graph, Node,Relationship
-
+from Investigador import Investigador
 URI = "neo4j+s://1e46531c.databases.neo4j.io"
 AUTH = ("neo4j", "proyectoBases12")
 
@@ -125,6 +125,76 @@ def recuperar_proyectos_para_visualizar():
 
 
 
+def verificar_publicaciones_existente(idPub):
+    graph = Graph(URI, auth=AUTH)
+    publicacion = graph.nodes.match("Publicaciones", idPub=idPub).first()
+    if publicacion==None:
+        return False 
+    else:
+        return True
+
+def actualizar_publicacion(idPub, datos_publicacion):
+    graph = Graph(URI, auth=AUTH)
+    publicacion = graph.nodes.match("Publicaciones", idPub=idPub).first()
+    if publicacion:
+        publicacion.update(**publicacion)
+        graph.push(publicacion)
+
+def obtener_nodos():
+    graph = Graph(URI, auth=AUTH)
+
+    consulta_cypher = """
+    MATCH (n:Publicaciones)
+    RETURN n
+    LIMIT 100
+    """
+
+    # Ejecutar la consulta y obtener los resultados
+    resultados = graph.run(consulta_cypher)
+
+    return resultados
+
+def crear_publicacion(datos_publicacion):
+    graph = Graph(URI, auth=AUTH)
+    publicacion = Node("Publicaciones", **datos_publicacion)
+    graph.create(publicacion)
 
 
+
+
+class DataBase:
+    #Método constructor
+    def __init__(self, pUri, pCredenciales):
+        #Especificación de atributos
+        self.__uri = pUri
+        self.__credenciales = pCredenciales
+        self.driver = None
+        self.conectado = None
+
+        try:
+            self.driver = GraphDatabase.driver(pUri, auth= pCredenciales)
+            self.driver.verify_connectivity()
+            self.conectado = True
+        except:
+            print("Error con la conexion a la base de datos")
+            self.conectado=False
+
+    def estaConectado(self):
+        return self.conectado
+
+    def query(self, consulta, parametros=None):
+        session = None
+        respuesta = None
+        if(self.estaConectado()):
+            try:
+                session = self.driver.session()
+                respuesta = list(session.run(consulta, parametros))
+            except:
+                print("Error de consulta")
+            finally:
+                if (session is not None):
+                    session.close()
+            
+        return respuesta
+    
 

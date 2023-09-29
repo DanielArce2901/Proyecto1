@@ -3,8 +3,7 @@ from io import StringIO
 from backend.database import crear_nodos_en_neo4j,crear_relaciones_para_publ_Proy,crear_relaciones_para_Inv_Proy
 from backend.database import crear_nodo
 from py2neo import Graph, Node
-#Hola
-#cuanto cuestas mamacita?
+
 
 def procesar_archivos(uploaded_files):
     nodos = []
