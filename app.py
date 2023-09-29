@@ -327,54 +327,119 @@ def main():
 
         elif gestion_choice == "Asociar Investigador":
             st.subheader("Asociar Investigador a un proyecto")
-            uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
-            if st.button("Cargar relaciones"):
-                if uploaded_files:
-                    for uploaded_file in uploaded_files:
-                        # Leer el archivo CSV y convertirlo en un DataFrame
-                        df = pd.read_csv(uploaded_file)
-                        
-                        # Verificar si el DataFrame tiene las columnas correctas
-                        if set(df.columns) != {'idInv', 'idProy'}:
-                            st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
-                            continue  # Pasar al siguiente archivo, si hay más
-                        
-                        # Verificar si los valores en las columnas son numéricos
-                        if not (df['idInv'].apply(lambda x: str(x).isnumeric()).all() and df['idProy'].apply(lambda x: str(x).isnumeric()).all()):
-                            st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
-                            continue  # Pasar al siguiente archivo, si hay más
-                        
-                        # Procesar las relaciones si todo está bien
-                        procesar_relaciones(uploaded_file)
-                        st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
-                else:
-                    st.warning("Por favor, suba los archivos CSV primero.")
-
+            operacion = st.selectbox("Seleccione una operación:", ["Subir archivos CSV", "Relacionar manualmente"])
+            
+            if operacion == "Subir archivos CSV":
+                uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
+                if st.button("Cargar relaciones"):
+                    if uploaded_files:
+                        for uploaded_file in uploaded_files:
+                            # Leer el archivo CSV y convertirlo en un DataFrame
+                            df = pd.read_csv(uploaded_file)
+                            
+                            # Verificar si el DataFrame tiene las columnas correctas
+                            if set(df.columns) != {'idInv', 'idProy'}:
+                                st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
+                                continue  # Pasar al siguiente archivo, si hay más
+                            
+                            # Verificar si los valores en las columnas son numéricos
+                            if not (df['idInv'].apply(lambda x: str(x).isnumeric()).all() and df['idProy'].apply(lambda x: str(x).isnumeric()).all()):
+                                st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
+                                continue  # Pasar al siguiente archivo, si hay más
+                            
+                            # Procesar las relaciones si todo está bien
+                            procesar_relaciones(uploaded_file)
+                            st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
+                    else:
+                        st.warning("Por favor, suba los archivos CSV primero.")
+            if operacion=="Relacionar manualmente":
+                st.subheader("Asociar Investigador a un proyecto")
+                
+                # Obtener la lista de investigadores y proyectos de la base de datos
+                investigadores = recuperar_Investigadores_para_visualizar()  
+                df_investigadores = pd.DataFrame(investigadores)
+                proyectos = recuperar_proyectos_para_visualizar() 
+                df_proyectos = pd.DataFrame(proyectos)
+                
+                # Crear un widget de selección con los nombres de los investigadores
+                selected_investigador = st.selectbox(
+                    'Selecciona un investigador:',
+                    df_investigadores.apply(lambda row: (row['id'], row['nombre_completo']), axis=1)
+                )[0]  # [0] para obtener el id del tuple (id, nombre_completo)
+                
+                # Crear un widget de selección múltiple con los nombres de los proyectos, pero retornando los ids
+                selected_proyectos = st.multiselect(
+                    'Selecciona los proyectos:',
+                    df_proyectos.apply(lambda row: (row['idPry'], row['titulo_proyecto']), axis=1)
+                )
+                selected_proyectos_ids = [proyecto[0] for proyecto in selected_proyectos]  # Obtener solo los ids de los proyectos seleccionados
+    
+                print (selected_proyectos)
+                print (selected_investigador)
+                if st.button("Asociar"):
+                    if not selected_proyectos:
+                        st.warning("Por favor, selecciona al menos un proyecto.")
+                    else:
+                        # Asociar el investigador seleccionado con los proyectos seleccionados
+                        asociar_investigador_proyectos(selected_investigador, selected_proyectos_ids)  # Deberías implementar esta función
+                        st.success(f"El investigador {selected_investigador} ha sido asociado correctamente a los proyectos seleccionados.")
             
         elif gestion_choice == "Asociar Artículo":
-            st.subheader("Asociar Artículo")
-            uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
-            if st.button("Cargar relaciones"):
-                if uploaded_files:
-                    for uploaded_file in uploaded_files:
-                        # Leer el archivo CSV y convertirlo en un DataFrame
-                        df = pd.read_csv(uploaded_file)
-                        
-                        # Verificar si el DataFrame tiene las columnas correctas
-                        if set(df.columns) != {'idProyecto', 'idArt'}:
-                            st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
-                            continue  # Pasar al siguiente archivo, si hay más
-                        
-                        # Verificar si los valores en las columnas son numéricos
-                        if not (df['idProyecto'].apply(lambda x: str(x).isnumeric()).all() and df['idArt'].apply(lambda x: str(x).isnumeric()).all()):
-                            st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
-                            continue  # Pasar al siguiente archivo, si hay más
-                        
-                        # Procesar las relaciones si todo está bien
-                        procesar_relaciones_entre_publ_Proy(uploaded_file)
-                        st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
-                else:
-                    st.warning("Por favor, suba los archivos CSV primero.")
+            st.subheader("Asociar Artículo a un proyecto")
+            operacion = st.selectbox("Seleccione una operación:", ["Subir archivos CSV", "Relacionar manualmente"])
+            
+            if operacion == "Subir archivos CSV":
+            
+                uploaded_files = st.file_uploader("Subir archivos CSV", type=["csv"], accept_multiple_files=True)
+                if st.button("Cargar relaciones"):
+                    if uploaded_files:
+                        for uploaded_file in uploaded_files:
+                            # Leer el archivo CSV y convertirlo en un DataFrame
+                            df = pd.read_csv(uploaded_file)
+                            
+                            # Verificar si el DataFrame tiene las columnas correctas
+                            if set(df.columns) != {'idProyecto', 'idArt'}:
+                                st.error(f"El archivo {uploaded_file.name} no tiene las columnas correctas.")
+                                continue  # Pasar al siguiente archivo, si hay más
+                            
+                            # Verificar si los valores en las columnas son numéricos
+                            if not (df['idProyecto'].apply(lambda x: str(x).isnumeric()).all() and df['idArt'].apply(lambda x: str(x).isnumeric()).all()):
+                                st.error(f"El archivo {uploaded_file.name} contiene valores no numéricos en las columnas de ID.")
+                                continue  # Pasar al siguiente archivo, si hay más
+                            
+                            # Procesar las relaciones si todo está bien
+                            procesar_relaciones_entre_publ_Proy(uploaded_file)
+                            st.success(f"Los datos del archivo {uploaded_file.name} se han cargado correctamente en Neo4j.")
+                    else:
+                        st.warning("Por favor, suba los archivos CSV primero.")
+            if operacion=="Relacionar manualmente":
+                st.subheader("Asociar artículo a un proyecto")
+                
+                # Obtener la lista de investigadores y proyectos de la base de datos
+                publicacion = recuperar_Publicaciones_para_visualizar()  
+                df_publicacion = pd.DataFrame(publicacion)
+                proyectos = recuperar_proyectos_para_visualizar() 
+                df_proyectos = pd.DataFrame(proyectos)
+                
+                # Crear un widget de selección con los nombres de los investigadores
+                selected_publicacion = st.selectbox(
+                    'Selecciona un artículo:',
+                    df_publicacion.apply(lambda row: (row['idPub'], row['nombre_revista']), axis=1)
+                )[0]  
+                
+                # Crear un widget de selección múltiple con los nombres de los proyectos, pero retornando los ids
+                selected_proyectos = st.selectbox(
+                    'Selecciona los proyectos:',
+                    df_proyectos.apply(lambda row: (row['idPry'], row['titulo_proyecto']), axis=1)
+                )
+                if st.button("Asociar"):
+                    if not selected_proyectos:
+                        st.warning("Por favor, selecciona al menos un proyecto.")
+                    else:
+                        # Asociar el investigador seleccionado con los proyectos seleccionados
+                        asociar_publicacion_proyectos(selected_publicacion, selected_proyectos)  # Deberías implementar esta función
+                        st.success(f"El artículo {selected_publicacion} ha sido asociado correctamente a los proyectos seleccionados.")
+                
 
             
 if __name__ == "__main__":

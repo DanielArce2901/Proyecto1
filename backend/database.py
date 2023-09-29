@@ -233,3 +233,75 @@ def recuperar_relaciones_proyectos_publicaciones():
     except Exception as e:
         print(f"Error al recuperar relaciones: {e}")
         return []  # Retorna una lista vacía en caso de error
+    
+    
+def asociar_investigador_proyectos(selected_investigador, selected_proyectos):
+    graph = Graph(URI, auth=AUTH)  # Asegúrate de que URI y AUTH estén definidos correctamente
+    try:
+        # Convertir el ID del investigador a int
+        idInv = int(selected_investigador)
+    except ValueError:
+        print(f"ID inválido: Investigador {selected_investigador}")
+        return
+    
+    # Verificar si el nodo del investigador existe antes de crear las relaciones
+    investigador = graph.nodes.match("Investigadores", id=idInv).first()
+    if not investigador:
+        print(f"No se pudo crear las relaciones porque el Investigador {idInv} no existe.")
+        return
+    
+    for idProy_str in selected_proyectos:
+        try:
+            # Convertir el ID del proyecto a int
+            idProy = int(idProy_str)
+            
+            # Verificar si el nodo del proyecto existe antes de crear la relación
+            proyecto = graph.nodes.match("Proyectos", idPry=idProy).first()
+            if not proyecto:
+                print(f"No se pudo crear la relación con el Proyecto {idProy} porque no existe.")
+                continue
+            
+            # Crear la relación entre el investigador y el proyecto
+            graph.create(Relationship(investigador, "PARTICIPA_EN", proyecto))
+            print(f"Relación creada con éxito entre Investigador {idInv} y Proyecto {idProy}")
+        
+        except ValueError:
+            print(f"ID inválido: Proyecto {idProy_str}")
+        except Exception as e:
+            print(f"Error al crear la relación entre Investigador {idInv} y Proyecto {idProy_str}: {e}")
+
+
+def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
+    graph = Graph(URI, auth=AUTH)  # Asegúrate de que URI y AUTH estén definidos correctamente
+    try:
+        # Convertir el ID del investigador a int
+        idInv = int(selected_publicacion)
+    except ValueError:
+        print(f"ID inválido: Investigador {selected_publicacion}")
+        return
+    
+    # Verificar si el nodo del investigador existe antes de crear las relaciones
+    investigador = graph.nodes.match("Publicaciones", idPub=idInv).first()
+    if not investigador:
+        print(f"No se pudo crear las relaciones porque el artículo {idInv} no existe.")
+        return
+    
+    for idProy_str in selected_proyectos:
+        try:
+            # Convertir el ID del proyecto a int
+            idProy = int(idProy_str)
+            
+            # Verificar si el nodo del proyecto existe antes de crear la relación
+            proyecto = graph.nodes.match("Proyectos", idPry=idProy).first()
+            if not proyecto:
+                print(f"No se pudo crear la relación con el Proyecto {idProy} porque no existe.")
+                continue
+            
+            # Crear la relación entre el investigador y el proyecto
+            graph.create(Relationship(investigador, "PERTENECE_A", proyecto))
+            print(f"Relación creada con éxito entre artículo {idInv} y Proyecto {idProy}")
+        
+        except ValueError:
+            print(f"ID inválido: Proyecto {idProy_str}")
+        except Exception as e:
+            print(f"Error al crear la relación entre artículo {idInv} y Proyecto {idProy_str}: {e}")
