@@ -275,22 +275,60 @@ def main():
 
             
         elif gestion_choice == "Gestion de Investigadores":
-            st.subheader("Investigadores")
-            operacion = st.selectbox("Seleccione una operación:", ["Crear", "Actualizar", "Visualizar"])
+             st.subheader("Investigadores")
+             operacion = st.selectbox("Seleccione una operación:", ["Crear", "Actualizar", "Visualizar"])
             
-            if operacion == "Crear":
-                #registrarInvestigador(base)
-                st.write("Proyectos:")
+             if operacion == "Crear":
+                investigador_data = {
+                    "idInv": st.number_input("ID del Investigador:", format="%d", value=0, step=1),
+                    "nombre_completo": st.text_input("Nombre completo del investigador:"),
+                    "titulo_academico": st.text_input("Título académico del investigador:"),
+                    "email": st.text_input("Email del investigador:")
+                }
+                idInv = int(investigador_data["idInv"])
+                if idInv:  # Verificar si el usuario ha ingresado un ID del investigador
+                    verificador=verificar_investigador_existente(idInv)
+                    if  verificador==True:
+                        st.warning("El investigador con este ID ya existe en la base de datos.")
+                    else:
+                        if st.button("Crear Investigador"):
+                            if investigador_data["nombre_completo"] and investigador_data["titulo_academico"]:
+                                crear_investigador(investigador_data)
+                                st.success("Investigador creado exitosamente.")
+                            else:
+                                st.warning("Faltan datos.") 
             
-            elif operacion == "Actualizar":
-                #modificarInvestigador(base)
-                st.write("Proyectos:")
-                
+             elif operacion == "Actualizar":
+                idInv = st.number_input("ID del Investigador a actualizar:",format="%d", value=0, step=1)
+                idInv=int(idInv)
+                if idInv:
+                    verificador=verificar_investigador_existente(idInv)
+                    if verificador==True:
+                        investigador_data = {
+                            "nombre_completo": st.text_input("Nuevo nombre completo del investigador:"),
+                            "titulo_academico": st.text_input("Nuevo título académico:"),
+                            "email": st.text_input("Nuevo email del investigador:")
+                        }
+                        if st.button("Actualizar Investigador"):
+                            actualizar_investigador(idInv, investigador_data)
+                            st.success("Investigador actualizado exitosamente.")
+                    else:
+                        st.error("El Investigador con este ID no existe en la base de datos.")
             
-            elif operacion == "Visualizar":
-                #mostrarInvestigador(base)
-                st.write("Proyectos:")
-            
+             elif operacion == "Visualizar":
+                st.write("Investigadores:")
+                proyectos = recuperar_investigadores_para_visualizar()
+                print (investigadores)
+                df_investigadores = pd.DataFrame(investigadores)
+                df_investigadores.rename(columns={
+                    'idInv': 'ID del Investigador',
+                    'nombre_completo': 'Nombre completo del investigador',
+                    'titulo_academico': 'Titulo académico del investigador',
+                    'email': 'Email del Investigador'
+                }, inplace=True)
+                st.title('Lista de Investigadores')
+                st.table(df_investigadores)
+
         elif gestion_choice == "Gestión de proyectos":
             st.subheader("Proyectos")
             

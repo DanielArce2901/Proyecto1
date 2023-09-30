@@ -91,6 +91,42 @@ def verificar_proyecto_existente(idPry):
         return False 
     else:
         return True
+    
+def verificar_investigador_existente(idInv):
+    graph = Graph(URI, auth=AUTH)
+    investigador = graph.nodes.match("Investigador", idInv=idInv).first()
+    if investigador==None:
+        return False 
+    else:
+        return True
+    
+def crear_investigador(investigador_data):
+    graph = Graph(URI, auth=AUTH)
+    investigador = Node("Investigadores", **investigador_data)
+    graph.create(investigador)
+
+def actualizar_investigador(idInv, investigador_data):
+    graph = Graph(URI, auth=AUTH)
+    investigador = graph.nodes.match("Investigadores", idInv=idInv).first()
+    if investigador:
+        investigador.update(**investigador_data)
+        graph.push(investigador)
+
+
+def recuperar_investigadores_para_visualizar():
+    graph = Graph(URI, auth=AUTH)
+    query = "MATCH (p:Investigadores) RETURN p"
+    try:
+        resultados = graph.run(query).data()
+        investigadores = []
+        for resultado in resultados:
+            investigador = resultado.get('p', {})
+            investigadores.append(investigador)
+        return investigadores
+    except Exception as e:
+        print(f"Error al recuperar el investigador: {e}")
+        return []  # Retorna una lista vacía en caso de error
+
 
 def crear_proyecto(proyecto_data):
     graph = Graph(URI, auth=AUTH)
@@ -103,8 +139,6 @@ def actualizar_proyecto(idPry, proyecto_data):
     if proyecto:
         proyecto.update(**proyecto_data)
         graph.push(proyecto)
-
-
 
 
 def recuperar_proyectos_para_visualizar():
@@ -121,19 +155,7 @@ def recuperar_proyectos_para_visualizar():
         print(f"Error al recuperar proyectos: {e}")
         return []  # Retorna una lista vacía en caso de error
 
-def recuperar_Investigadores_para_visualizar():
-    graph = Graph(URI, auth=AUTH)
-    query = "MATCH (p:Investigadores) RETURN p"
-    try:
-        resultados = graph.run(query).data()
-        proyectos = []
-        for resultado in resultados:
-            proyecto = resultado.get('p', {})
-            proyectos.append(proyecto)
-        return proyectos
-    except Exception as e:
-        print(f"Error al recuperar proyectos: {e}")
-        return []  # Retorna una lista vacía en caso de error
+    
 
 def recuperar_Publicaciones_para_visualizar():
     graph = Graph(URI, auth=AUTH)
