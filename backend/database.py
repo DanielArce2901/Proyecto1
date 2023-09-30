@@ -206,6 +206,7 @@ def crear_publicacion(datos_publicacion):
     publicacion = Node("Publicaciones", **datos_publicacion)
     graph.create(publicacion)
 
+<<<<<<< Updated upstream
     
 
 def recuperar_relaciones_proyectos_investigadores():
@@ -333,6 +334,11 @@ def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
 def obtener_areas():
     graph = Graph(URI, auth=AUTH)
 
+=======
+def obtener_areas():
+    graph = Graph(URI, auth=AUTH)
+
+>>>>>>> Stashed changes
     consulta_areas = """
     MATCH (p:Proyectos) RETURN DISTINCT p.area_conocimiento AS area
     """
@@ -372,4 +378,12 @@ def obtener_datos(selected_investigador):
     consulta_colegas = f"MATCH (i:Investigadores {{nombre_completo: '{selected_investigador}'}})-[:PARTICIPA_EN]->(p:Proyectos)<-[:PARTICIPA_EN]-(colega:Investigadores) RETURN colega.nombre_completo AS colega_nombre"
     colegas = [resultado["colega_nombre"] for resultado in graph.run(consulta_colegas)]
 
+<<<<<<< Updated upstream
     return informacion, colegas
+=======
+    return informacion, colegas
+
+
+
+
+>>>>>>> Stashed changes
