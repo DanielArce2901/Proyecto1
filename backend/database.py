@@ -305,3 +305,49 @@ def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
             print(f"ID inválido: Proyecto {idProy_str}")
         except Exception as e:
             print(f"Error al crear la relación entre artículo {idInv} y Proyecto {idProy_str}: {e}")
+            
+            
+            
+def obtener_areas():
+    graph = Graph(URI, auth=AUTH)
+
+    consulta_areas = """
+    MATCH (p:Proyectos) RETURN DISTINCT p.area_conocimiento AS area
+    """
+    areas_de_conocimiento = [resultado["area"] for resultado in graph.run(consulta_areas)]
+
+    return areas_de_conocimiento
+
+def obtener_informacion_area_conocimiento(selected_area):
+    graph = Graph(URI, auth=AUTH)
+
+    consulta_nombre_area = f"MATCH (p:Proyectos) WHERE p.area_conocimiento = '{selected_area}' RETURN DISTINCT p.area_conocimiento AS Area"
+    area_nombre = graph.run(consulta_nombre_area).evaluate()
+
+    consulta_proyectos = f"MATCH (p:Proyectos) WHERE p.area_conocimiento = '{selected_area}' RETURN DISTINCT p.titulo_proyecto AS Titulo"
+    proyectos = [resultado["Titulo"] for resultado in graph.run(consulta_proyectos)]
+
+    consulta_publicaciones = f"MATCH (pu:Publicaciones)-[:PERTENECE_A]->(p:Proyectos) WHERE p.area_conocimiento = '{selected_area}' RETURN pu.titulo_publicacion AS Titulo"
+    publicaciones = [resultado["Titulo"] for resultado in graph.run(consulta_publicaciones)]
+
+    return area_nombre, proyectos, publicaciones
+
+def obtener_investigadores():
+    graph = Graph(URI, auth=AUTH)
+
+    consulta_nombres = """
+   MATCH (i:Investigadores) RETURN DISTINCT i.nombre_completo AS Nombre
+    """
+    nombre_completo = [resultado["Nombre"] for resultado in graph.run(consulta_nombres)]
+
+    return nombre_completo
+
+def obtener_datos(selected_investigador):
+    graph = Graph(URI, auth=AUTH)
+    consulta_informacion = f"MATCH (i:Investigadores {{nombre_completo: '{selected_investigador}'}}) RETURN i.id AS id, i.nombre_completo AS nombre, i.titulo_academico AS titulo, i.institucion AS institucion, i.email AS correo"
+    informacion = graph.run(consulta_informacion).data()[0]
+
+    consulta_colegas = f"MATCH (i:Investigadores {{nombre_completo: '{selected_investigador}'}})-[:PARTICIPA_EN]->(p:Proyectos)<-[:PARTICIPA_EN]-(colega:Investigadores) RETURN colega.nombre_completo AS colega_nombre"
+    colegas = [resultado["colega_nombre"] for resultado in graph.run(consulta_colegas)]
+
+    return informacion, colegas

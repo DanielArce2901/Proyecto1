@@ -155,7 +155,33 @@ def main():
                     st.write(proyectos_asociados)
                 else:
                     st.warning('No hay proyectos asociados a esta publicación.')
+        if opcionInicio == "Buscar area de conocimiento":
+            selected_area = st.selectbox("Selecciona un área de conocimiento", obtener_areas())
+            if st.button("Mostrar información"):
+                area_nombre, proyectos, publicaciones = obtener_informacion_area_conocimiento(selected_area)
+                 # Mostrar la información en Streamlit
+                st.subheader("Información del área de conocimiento")
+                st.write("Nombre del área:", area_nombre)
+                st.subheader("Proyectos en esta área")
+                for resultado in proyectos:
+                    st.write(resultado)
+                st.subheader("Publicaciones asociadas a proyectos en esta área")
+                for resultado in publicaciones:
+                    st.write(resultado)
+        if opcionInicio == "Busqueda por Colegas":
+            selected_investigador = st.selectbox("Selecciona el investigador", obtener_investigadores())
+            informacion, colegas = obtener_datos(selected_investigador)
+            if st.button("Mostrar información"):
+                st.subheader("Información del Investigador")
+                st.markdown( f'<p style="color:white;">ID: {informacion["id"]}</p>',unsafe_allow_html=True)
+                st.write("Nombre completo:", informacion["nombre"])
+                st.write("Título académico:", informacion["titulo"])
+                st.write("Institución:", informacion["institucion"])
+                st.markdown( f'<p style="color:white;">Correo: {informacion["correo"]}</p>',unsafe_allow_html=True)
 
+                st.subheader("Colegas con los que ha trabajado en proyectos de investigación")
+                for colega in colegas:
+                    st.write(colega)
 
         
     elif choice == "Subir Datos":
