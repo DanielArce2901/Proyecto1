@@ -3,6 +3,8 @@ from py2neo import Graph, Node,Relationship
 URI = "neo4j+s://1e46531c.databases.neo4j.io"
 AUTH = ("neo4j", "proyectoBases12")
 
+# Funciones relacionadas a los nodos 
+
 def crear_nodos_en_neo4j(nodos):
     graph = Graph(URI, auth=AUTH)
     for nodo in nodos:
@@ -35,7 +37,6 @@ def crear_relaciones_para_Inv_Proy(relaciones):
                 print(f"IDs inválidos: Investigador {idInv}, Proyecto {idProy}")
         except Exception as e:
             print(f"Error al crear la relación entre Investigador {relacion.get('idInv')} y Proyecto {relacion.get('idProy')}: {e}")
-
 
 
 def verificar_nodos_Inv_Proy(graph, idInv, idProy):
@@ -91,6 +92,8 @@ def verificar_proyecto_existente(idPry):
         return False 
     else:
         return True
+
+ # Funciones para el CRUD de investigador 
     
 def verificar_investigador_existente(idInv):
     graph = Graph(URI, auth=AUTH)
@@ -127,6 +130,7 @@ def recuperar_investigadores_para_visualizar():
         print(f"Error al recuperar el investigador: {e}")
         return []  # Retorna una lista vacía en caso de error
 
+# Funciones para el CRUD de proyecto 
 
 def crear_proyecto(proyecto_data):
     graph = Graph(URI, auth=AUTH)
@@ -154,8 +158,8 @@ def recuperar_proyectos_para_visualizar():
     except Exception as e:
         print(f"Error al recuperar proyectos: {e}")
         return []  # Retorna una lista vacía en caso de error
-
-    
+   
+# Funciones para el CRUD de publicacion 
 
 def recuperar_Publicaciones_para_visualizar():
     graph = Graph(URI, auth=AUTH)
@@ -171,6 +175,10 @@ def recuperar_Publicaciones_para_visualizar():
         print(f"Error al recuperar proyectos: {e}")
         return []  # Retorna una lista vacía en caso de error
 
+def crear_publicacion(datos_publicacion):
+    graph = Graph(URI, auth=AUTH)
+    publicacion = Node("Publicaciones", **datos_publicacion)
+    graph.create(publicacion)
 
 def verificar_publicaciones_existente(idPub):
     graph = Graph(URI, auth=AUTH)
@@ -187,6 +195,9 @@ def actualizar_publicacion(idPub, datos_publicacion):
         publicacion.update(**publicacion)
         graph.push(publicacion)
 
+
+# Relaciones 
+
 def obtener_nodos():
     graph = Graph(URI, auth=AUTH)
 
@@ -200,14 +211,6 @@ def obtener_nodos():
     resultados = graph.run(consulta_cypher)
 
     return resultados
-
-def crear_publicacion(datos_publicacion):
-    graph = Graph(URI, auth=AUTH)
-    publicacion = Node("Publicaciones", **datos_publicacion)
-    graph.create(publicacion)
-
-<<<<<<< Updated upstream
-    
 
 def recuperar_relaciones_proyectos_investigadores():
     graph = Graph(URI, auth=AUTH)
@@ -259,7 +262,7 @@ def recuperar_relaciones_proyectos_publicaciones():
     
     
 def asociar_investigador_proyectos(selected_investigador, selected_proyectos):
-    graph = Graph(URI, auth=AUTH)  # Asegúrate de que URI y AUTH estén definidos correctamente
+    graph = Graph(URI, auth=AUTH)  # Asegurarse de que URI y AUTH estén definidos correctamente
     try:
         # Convertir el ID del investigador a int
         idInv = int(selected_investigador)
@@ -295,7 +298,7 @@ def asociar_investigador_proyectos(selected_investigador, selected_proyectos):
 
 
 def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
-    graph = Graph(URI, auth=AUTH)  # Asegúrate de que URI y AUTH estén definidos correctamente
+    graph = Graph(URI, auth=AUTH)  # Asegurarse de que URI y AUTH estén definidos correctamente
     try:
         # Convertir el ID del investigador a int
         idInv = int(selected_publicacion)
@@ -328,17 +331,13 @@ def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
             print(f"ID inválido: Proyecto {idProy_str}")
         except Exception as e:
             print(f"Error al crear la relación entre artículo {idInv} y Proyecto {idProy_str}: {e}")
+
             
-            
+ #Funciones para las consultas            
             
 def obtener_areas():
     graph = Graph(URI, auth=AUTH)
 
-=======
-def obtener_areas():
-    graph = Graph(URI, auth=AUTH)
-
->>>>>>> Stashed changes
     consulta_areas = """
     MATCH (p:Proyectos) RETURN DISTINCT p.area_conocimiento AS area
     """
@@ -378,12 +377,49 @@ def obtener_datos(selected_investigador):
     consulta_colegas = f"MATCH (i:Investigadores {{nombre_completo: '{selected_investigador}'}})-[:PARTICIPA_EN]->(p:Proyectos)<-[:PARTICIPA_EN]-(colega:Investigadores) RETURN colega.nombre_completo AS colega_nombre"
     colegas = [resultado["colega_nombre"] for resultado in graph.run(consulta_colegas)]
 
-<<<<<<< Updated upstream
-    return informacion, colegas
-=======
     return informacion, colegas
 
+# Funciones para consultas 1,2 y 3
 
+def obtener_top_areas_conocimiento():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (p:Proyectos)
+                RETURN p.area_conocimiento AS AreaConocimiento, COUNT(*) AS CantidadProyectos
+                ORDER BY CantidadProyectos DESC
+                LIMIT 5;
+                """
+            )
+            return [(record["AreaConocimiento"], record["CantidadProyectos"]) for record in result]
 
+def obtener_top_instituciones():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (i:Investigadores)-[:PARTICIPA_EN]->(p:Proyectos)
+                WITH i.institucion AS Institucion, COUNT(*) AS CantidadProyectos
+                RETURN Institucion, CantidadProyectos
+                ORDER BY CantidadProyectos DESC
+                LIMIT 5;
+                """
+            )
+            return [(record["Institucion"], record["CantidadProyectos"]) for record in result]
+        
 
->>>>>>> Stashed changes
+def obtener_top_investigadores():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (i:Investigadores)-[:PARTICIPA_EN]->(p:Proyectos)
+                RETURN i.nombre_completo AS NombreInvestigador, i.institucion AS Institucion, COUNT(*) AS CantidadProyectos
+                ORDER BY CantidadProyectos DESC
+                LIMIT 5;
+                """
+            )
+            return [(record["NombreInvestigador"], record["Institucion"], record["CantidadProyectos"]) for record in result]
+
+        

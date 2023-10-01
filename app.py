@@ -15,16 +15,39 @@ def main():
     menu = ["Consultas", "Subir Datos", "Gestión de Datos"]
     choice = st.sidebar.selectbox("Menú", menu)
     if choice == "Consultas":
-        st.subheader("Sección de Consultas")
-<<<<<<< Updated upstream
-        opcionInicio = st.selectbox('¿Seleccione lo que desea consultar?', ["Buscar Investigador", "Buscar Proyecto","Buscar Publicacion","Buscar area de conocimiento","Busqueda por Colegas"])
-        investigador=recuperar_Investigadores_para_visualizar()
-        df_investigador = pd.DataFrame(investigador)
-        proyecto=recuperar_proyectos_para_visualizar()
-        df_proyecto = pd.DataFrame(proyecto)
-        publicacion=recuperar_Publicaciones_para_visualizar()
-        df_publicacion = pd.DataFrame(publicacion)
-        if (opcionInicio=="Buscar Investigador"):
+       st.subheader("Sección de Consultas")
+       opcionInicio = st.selectbox('¿Seleccione lo que desea consultar?', ["Top 5 de áreas de conocimiento","Top 5 de instituciones","Top 5 investigadores(as)", "Buscar Investigador", "Buscar Proyecto","Buscar Publicacion","Buscar area de conocimiento","Busqueda por Colegas"])
+       investigador=recuperar_investigadores_para_visualizar()
+       df_investigador = pd.DataFrame(investigador)
+       proyecto=recuperar_proyectos_para_visualizar()
+       df_proyecto = pd.DataFrame(proyecto)
+       publicacion=recuperar_Publicaciones_para_visualizar()
+       df_publicacion = pd.DataFrame(publicacion)
+
+       # Consulta 1
+       if (opcionInicio=="Top 5 de áreas de conocimiento"):
+            st.title('Top 5 de áreas de conocimiento con la mayor cantidad de investigaciones')
+            data = obtener_top_areas_conocimiento()
+            df = pd.DataFrame(data, columns=["Área de Conocimiento", "Cantidad de Proyectos"])
+            st.dataframe(df)
+
+       # Consulta 2
+       if (opcionInicio=="Top 5 de instituciones"):
+            st.title("Top 5 de Instituciones con la Mayor Cantidad de Investigaciones")
+            data = obtener_top_instituciones()
+            df = pd.DataFrame(data, columns=["Institución", "Cantidad de Investigaciones"])
+            st.dataframe(df)
+
+       # Consulta 3
+       if (opcionInicio=="Top 5 investigadores(as)"):
+            st.title('Top 5 de Investigadores con la Mayor Cantidad de Investigaciones')
+            # Obtener los datos de los investigadores
+            data = obtener_top_investigadores()
+            df = pd.DataFrame(data, columns=["Nombre del Investigador", "Institución", "Cantidad de Proyectos"])
+            st.dataframe(df)
+
+       # Consulta 4
+       if (opcionInicio=="Buscar Investigador"):
             st.title('Búsqueda de un Investigador')
             relacion_inv_pry=recuperar_relaciones_proyectos_investigadores()
             df_relacion_inv_pry= pd.DataFrame(relacion_inv_pry)
@@ -66,10 +89,9 @@ def main():
             else:
                 st.warning('Este investigador no está asociado a ningún proyecto.')
 
-                
+       # Consulta 5
 
-
-        if (opcionInicio=="Buscar Proyecto"):
+       if (opcionInicio=="Buscar Proyecto"):
             st.title('Búsqueda de un Proyecto')
             relacion_inv_pry=recuperar_relaciones_proyectos_investigadores()
             df_relacion_inv_pry= pd.DataFrame(relacion_inv_pry)
@@ -112,8 +134,9 @@ def main():
             else:
                 st.warning('No hay investigadores asociados a este proyecto.')
 
+       # Consulta 6
 
-        if (opcionInicio=="Buscar Publicacion"):
+       if (opcionInicio=="Buscar Publicacion"):
             st.title('Búsqueda de una Publicación')
             relacion_plu_pry=recuperar_relaciones_proyectos_publicaciones()
             df_relacion_plu_pry= pd.DataFrame(relacion_plu_pry)
@@ -156,7 +179,10 @@ def main():
                     st.write(proyectos_asociados)
                 else:
                     st.warning('No hay proyectos asociados a esta publicación.')
-        if opcionInicio == "Buscar area de conocimiento":
+
+       # Consulta 7
+
+       if opcionInicio == "Buscar area de conocimiento":
             selected_area = st.selectbox("Selecciona un área de conocimiento", obtener_areas())
             if st.button("Mostrar información"):
                 area_nombre, proyectos, publicaciones = obtener_informacion_area_conocimiento(selected_area)
@@ -169,7 +195,10 @@ def main():
                 st.subheader("Publicaciones asociadas a proyectos en esta área")
                 for resultado in publicaciones:
                     st.write(resultado)
-        if opcionInicio == "Busqueda por Colegas":
+
+     # Consulta 8 
+
+       if opcionInicio == "Busqueda por Colegas":
             selected_investigador = st.selectbox("Selecciona el investigador", obtener_investigadores())
             informacion, colegas = obtener_datos(selected_investigador)
             if st.button("Mostrar información"):
@@ -184,40 +213,6 @@ def main():
                 for colega in colegas:
                     st.write(colega)
 
-=======
-        consultas_menu = ["Areas de conocimiento","Colegas"]
-        consultas_choice = st.sidebar.selectbox("Consultas", consultas_menu)
-        
-        if consultas_choice == "Areas de conocimiento":
-            selected_area = st.selectbox("Selecciona un área de conocimiento", obtener_areas())
-            if st.button("Mostrar información"):
-                area_nombre, proyectos, publicaciones = obtener_informacion_area_conocimiento(selected_area)
-                 # Mostrar la información en Streamlit
-                st.subheader("Información del área de conocimiento")
-                st.write("Nombre del área:", area_nombre)
-                st.subheader("Proyectos en esta área")
-                for resultado in proyectos:
-                    st.write(resultado)
-                st.subheader("Publicaciones asociadas a proyectos en esta área")
-                for resultado in publicaciones:
-                    st.write(resultado)
-        if consultas_choice == "Colegas":
-            selected_investigador = st.selectbox("Selecciona el investigador", obtener_investigadores())
-            informacion, colegas = obtener_datos(selected_investigador)
-            if st.button("Mostrar información"):
-                st.subheader("Información del Investigador")
-                st.markdown( f'<p style="color:white;">ID: {informacion["id"]}</p>',unsafe_allow_html=True)
-                st.write("Nombre completo:", informacion["nombre"])
-                st.write("Título académico:", informacion["titulo"])
-                st.write("Institución:", informacion["institucion"])
-                st.markdown( f'<p style="color:white;">Correo: {informacion["correo"]}</p>',unsafe_allow_html=True)
-
-                st.subheader("Colegas con los que ha trabajado en proyectos de investigación")
-                for colega in colegas:
-                    st.write(colega)
-
-        
->>>>>>> Stashed changes
         
     elif choice == "Subir Datos":
         st.subheader("Sección para Subir Datos")
@@ -454,7 +449,7 @@ def main():
                 st.subheader("Asociar Investigador a un proyecto")
                 
                 # Obtener la lista de investigadores y proyectos de la base de datos
-                investigadores = recuperar_Investigadores_para_visualizar()  
+                investigadores = recuperar_investigadores_para_visualizar()  
                 df_investigadores = pd.DataFrame(investigadores)
                 proyectos = recuperar_proyectos_para_visualizar() 
                 df_proyectos = pd.DataFrame(proyectos)
