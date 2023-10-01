@@ -350,7 +350,7 @@ def main():
             
              elif operacion == "Visualizar":
                 st.write("Investigadores:")
-                proyectos = recuperar_investigadores_para_visualizar()
+                investigadores = recuperar_investigadores_para_visualizar()
                 print (investigadores)
                 df_investigadores = pd.DataFrame(investigadores)
                 df_investigadores.rename(columns={
