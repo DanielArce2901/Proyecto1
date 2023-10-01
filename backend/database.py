@@ -97,7 +97,7 @@ def verificar_proyecto_existente(idPry):
     
 def verificar_investigador_existente(idInv):
     graph = Graph(URI, auth=AUTH)
-    investigador = graph.nodes.match("Investigador", idInv=idInv).first()
+    investigador = graph.nodes.match("Investigadores", idInv=idInv).first()
     if investigador==None:
         return False 
     else:
@@ -421,5 +421,19 @@ def obtener_top_investigadores():
                 """
             )
             return [(record["NombreInvestigador"], record["Institucion"], record["CantidadProyectos"]) for record in result]
+        
+def recuperar_publicaciones_para_visualizar():
+    graph = Graph(URI, auth=AUTH)
+    query = "MATCH (p:Publicaciones) RETURN p"
+    try:
+        resultados = graph.run(query).data()
+        publicaciones = []
+        for resultado in resultados:
+            publicacion = resultado.get('p', {})
+            publicaciones.append(publicacion )
+        return publicaciones
+    except Exception as e:
+        print(f"Error al recuperar el investigador: {e}")
+        return []  # Retorna una lista vacía en caso de error
 
         

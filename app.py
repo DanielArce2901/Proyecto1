@@ -276,9 +276,10 @@ def main():
                     if  verificador==True:
                         st.warning("Ya existe una publicacion con ese ID.")
                     else:
-                        if st.button("Crear Publicacion"):
-                            crear_publicacion(datos)
-                            st.success("Publicacion creada")
+                        if datos["titulo_publicacion"] and datos["nombre_revista"]:
+                            if st.button("Crear Publicacion"):
+                                crear_publicacion(datos)
+                                st.success("Publicacion creada")
 
             elif opcion == "Actualizar":
 
@@ -292,19 +293,24 @@ def main():
                         "nombre_revista": st.text_input("Nombre de la revista"),
                         "anno_publicacion": st.number_input("Año publicacion", format= "%d", value=0, step = 1)
                         }
-                        if st.button("actualizar publicacion"):
-                            actualizar_publicacion(idPub, datos)
-                            st.success("Actualizacion realizada")
+                        if datos["titulo_publicacion"] and datos["nombre_revista"]:
+                            if st.button("Actualizar publicacion"):
+                                actualizar_publicacion(idPub, datos)
+                                st.success("Actualizacion realizada")
                     else:
                         st.warning("No se encontro el ID")
             
             elif opcion == "Visualizar":
-                st.subheader("Publicaciones almacenadas")
-                if st.button("Mostrar publicaciones"):
-                    resultados = obtener_nodos()
-                    for resultado in resultados:
-                        nodo = resultado["n"]
-                        st.write("ID:", nodo.identity, "Propiedades:",dict(nodo))
+                publicaciones = recuperar_publicaciones_para_visualizar()
+                df_publicaciones = pd.DataFrame(publicaciones)
+                df_publicaciones.rename(columns={
+                    'anno_publicacion': 'Año de publicacion',
+                    'nombre_revista': 'Nombre de revista',
+                    'titulo_publicacion': 'Titulo de publicacion',
+                    'idPub': 'ID de la publicacion'
+                }, inplace=True)
+                st.title('Lista de Proyectos')
+                st.table(df_publicaciones)
 
             
         elif gestion_choice == "Gestion de Investigadores":
@@ -324,12 +330,10 @@ def main():
                     if  verificador==True:
                         st.warning("El investigador con este ID ya existe en la base de datos.")
                     else:
-                        if st.button("Crear Investigador"):
-                            if investigador_data["nombre_completo"] and investigador_data["titulo_academico"]:
+                        if investigador_data["nombre_completo"] and investigador_data["titulo_academico"] and investigador_data["email"]:
+                            if st.button("Crear Investigador"):
                                 crear_investigador(investigador_data)
                                 st.success("Investigador creado exitosamente.")
-                            else:
-                                st.warning("Faltan datos.") 
             
              elif operacion == "Actualizar":
                 idInv = st.number_input("ID del Investigador a actualizar:",format="%d", value=0, step=1)
@@ -342,9 +346,10 @@ def main():
                             "titulo_academico": st.text_input("Nuevo título académico:"),
                             "email": st.text_input("Nuevo email del investigador:")
                         }
-                        if st.button("Actualizar Investigador"):
-                            actualizar_investigador(idInv, investigador_data)
-                            st.success("Investigador actualizado exitosamente.")
+                        if investigador_data["nombre_completo"] and investigador_data["titulo_academico"] and investigador_data["email"]:
+                            if st.button("Actualizar Investigador"):
+                                actualizar_investigador(idInv, investigador_data)
+                                st.success("Investigador actualizado exitosamente.")
                     else:
                         st.error("El Investigador con este ID no existe en la base de datos.")
             
@@ -401,9 +406,10 @@ def main():
                             "duracion_meses": st.number_input("Nueva Duración en Meses:", format="%d", value=0, step=1),
                             "area_conocimiento": st.text_input("Nueva Área de Conocimiento:")
                         }
-                        if st.button("Actualizar Proyecto"):
-                            actualizar_proyecto(idPry, proyecto_data)
-                            st.success("Proyecto actualizado exitosamente.")
+                        if proyecto_data["titulo_proyecto"] and proyecto_data["area_conocimiento"]:
+                            if st.button("Actualizar Proyecto"):
+                                actualizar_proyecto(idPry, proyecto_data)
+                                st.success("Proyecto actualizado exitosamente.")
                     else:
                         st.error("El proyecto con este ID no existe en la base de datos.")
             
