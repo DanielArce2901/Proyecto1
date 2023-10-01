@@ -319,12 +319,12 @@ def main():
             
              if operacion == "Crear":
                 investigador_data = {
-                    "idInv": st.number_input("ID del Investigador:", format="%d", value=0, step=1),
+                    "id": st.number_input("ID del Investigador:", format="%d", value=0, step=1),
                     "nombre_completo": st.text_input("Nombre completo del investigador:"),
                     "titulo_academico": st.text_input("Título académico del investigador:"),
                     "email": st.text_input("Email del investigador:")
                 }
-                idInv = int(investigador_data["idInv"])
+                idInv = int(investigador_data["id"])
                 if idInv:  # Verificar si el usuario ha ingresado un ID del investigador
                     verificador=verificar_investigador_existente(idInv)
                     if  verificador==True:
@@ -359,7 +359,7 @@ def main():
                 print (investigadores)
                 df_investigadores = pd.DataFrame(investigadores)
                 df_investigadores.rename(columns={
-                    'idInv': 'ID del Investigador',
+                    'id': 'ID del Investigador',
                     'nombre_completo': 'Nombre completo del investigador',
                     'titulo_academico': 'Titulo académico del investigador',
                     'email': 'Email del Investigador'

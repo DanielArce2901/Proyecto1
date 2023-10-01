@@ -97,7 +97,7 @@ def verificar_proyecto_existente(idPry):
     
 def verificar_investigador_existente(idInv):
     graph = Graph(URI, auth=AUTH)
-    investigador = graph.nodes.match("Investigadores", idInv=idInv).first()
+    investigador = graph.nodes.match("Investigadores", id=idInv).first()
     if investigador==None:
         return False 
     else:
