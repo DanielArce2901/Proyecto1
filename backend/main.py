@@ -3,6 +3,7 @@ from io import StringIO
 from backend.database import crear_nodos_en_neo4j,crear_relaciones_para_publ_Proy,crear_relaciones_para_Inv_Proy
 from backend.database import crear_nodo
 from py2neo import Graph, Node
+import streamlit as st
 
 
 def procesar_archivos(uploaded_files):
@@ -90,8 +91,31 @@ def procesar_relaciones_entre_publ_Proy(uploaded_files):
     crear_relaciones_para_publ_Proy(relaciones)
     return relaciones
 
+    # Cambiar el color de fondo
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #f0f0f0; /* Cambia el color de fondo a gris claro */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Cambiar el color de los botones
+    st.markdown(
+        """
+        <style>
+        button {
+            background-color: #007BFF; /* Cambia el color de los botones a azul */
+            color: white; /* Cambia el color del texto de los botones a blanco */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 
-
-    
+        
 
