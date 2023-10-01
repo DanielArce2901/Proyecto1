@@ -8,48 +8,6 @@ import streamlit as st
 
 #______________________________Personalizar interfaz_________________________
 
-# Personalizar el color de fondo de la página
-st.markdown(
-        """
-        <style>
-        body {
-            background-color: #f0f0f0; /* Cambia el color de fondo de la página a gris claro */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Personalizar el color del texto
-st.markdown(
-        """
-        <style>
-        p, h1, h2, h3 {
-            color: #333; /* Cambia el color del texto a gris oscuro */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Personalizar el color de los botones
-st.markdown(
-        """
-        <style>
-        /* Cambiar el color de fondo de los botones */
-        .stButton > button {
-            background-color: #007BFF !important; /* Cambia el color de fondo de los botones a azul */
-            color: white !important; /* Cambia el color del texto de los botones a blanco */
-        }
-
-        /* Cambiar el color de fondo de los botones al pasar el cursor por encima */
-        .stButton > button:hover {
-            background-color: #0056b3 !important; /* Cambia el color de fondo al pasar el cursor a un azul más oscuro */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 
 
 
