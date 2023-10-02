@@ -113,7 +113,7 @@ def crear_investigador(investigador_data):
 
 def actualizar_investigador(idInv, investigador_data):
     graph = Graph(URI, auth=AUTH)
-    investigador = graph.nodes.match("Investigadores", idInv=idInv).first()
+    investigador = graph.nodes.match("Investigadores", id=idInv).first()
     if investigador:
         investigador.update(**investigador_data)
         graph.push(investigador)
@@ -191,11 +191,11 @@ def verificar_publicaciones_existente(idPub):
     else:
         return True
 
-def actualizar_publicacion(idPub, datos_publicacion):
+def actualizar_publicacion(idPub, publicacion_data):
     graph = Graph(URI, auth=AUTH)
     publicacion = graph.nodes.match("Publicaciones", idPub=idPub).first()
     if publicacion:
-        publicacion.update(**publicacion)
+        publicacion.update(**publicacion_data)
         graph.push(publicacion)
 
 

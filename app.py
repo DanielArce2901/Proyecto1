@@ -254,21 +254,21 @@ def main():
                 opcion= st.selectbox("Seleccione la opcion:", ["Crear","Actualizar", "Visualizar"])
 
                 if opcion == "Crear":
-                    datos = {
+                    publicaciones_data = {
                         "idPub": st.number_input("ID de la publicacion:", format= "%d", value=0, step = 1),
                         "titulo_publicacion": st.text_input("Titulo de la publicacion"),
                         "nombre_revista": st.text_input("Nombre de la revista"),
                         "anno_publicacion": st.number_input("Año de publicacion:", format= "%d", value=0, step = 1)
                     }
-                    idPub = int(datos["idPub"])
+                    idPub = int(publicaciones_data["idPub"])
                     if idPub:  # Verificar si el usuario ha ingresado un ID del proyecto
                         verificador=verificar_publicaciones_existente(idPub)
                         if  verificador==True:
                             st.warning("Ya existe una publicacion con ese ID.")
                         else:
-                            if datos["titulo_publicacion"] and datos["nombre_revista"]:
+                            if publicaciones_data["titulo_publicacion"] and publicaciones_data["nombre_revista"]:
                                 if st.button("Crear Publicacion"):
-                                    crear_publicacion(datos)
+                                    crear_publicacion(publicaciones_data)
                                     st.success("Publicacion creada")
 
                 elif opcion == "Actualizar":
@@ -278,14 +278,14 @@ def main():
                     if idPub:
                         verificador = verificar_publicaciones_existente(idPub)
                         if verificador == True:
-                            datos = {
+                            publicaciones_data = {
                             "titulo_publicacion": st.text_input("Titulo de la publicacion"),
                             "nombre_revista": st.text_input("Nombre de la revista"),
                             "anno_publicacion": st.number_input("Año publicacion", format= "%d", value=0, step = 1)
                             }
-                            if datos["titulo_publicacion"] and datos["nombre_revista"]:
+                            if publicaciones_data["titulo_publicacion"] and publicaciones_data["nombre_revista"]:
                                 if st.button("Actualizar publicacion"):
-                                    actualizar_publicacion(idPub, datos)
+                                    actualizar_publicacion(idPub, publicaciones_data)
                                     st.success("Actualizacion realizada")
                         else:
                             st.warning("No se encontro el ID")
