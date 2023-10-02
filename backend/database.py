@@ -3,8 +3,8 @@ from py2neo import Graph, Node,Relationship
 import pandas as pd
 from io import StringIO
 import streamlit as st
-URI = "bolt://localhost:7687"
-AUTH = ("neo4j", "DJsus5LsAiWLQ8OujG99DFUiGIp4rtKGRklkjKu__zw")
+URI = "neo4j+s://cff1ba64.databases.neo4j.io"
+AUTH = ("neo4j", "K0q9VNmwzevp03SSPJWLPik86uk_3C78zLfIhwSwrwU")
 
 # Funciones relacionadas a los nodos 
 
