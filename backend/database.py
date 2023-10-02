@@ -1,7 +1,10 @@
 from neo4j import GraphDatabase
 from py2neo import Graph, Node,Relationship
-URI = "neo4j+s://1e46531c.databases.neo4j.io"
-AUTH = ("neo4j", "proyectoBases12")
+import pandas as pd
+from io import StringIO
+import streamlit as st
+URI = "bolt://localhost:7687"
+AUTH = ("neo4j", "DJsus5LsAiWLQ8OujG99DFUiGIp4rtKGRklkjKu__zw")
 
 # Funciones relacionadas a los nodos 
 
@@ -437,3 +440,66 @@ def recuperar_publicaciones_para_visualizar():
         return []  # Retorna una lista vacía en caso de error
 
         
+
+
+
+
+def crear_nodo_publicaciones(titulo_publicacion, nombre_revista, anno_publicacion):
+    # Crea un nodo de tipo "Publicaciones" con las propiedades especificadas
+    nodo = Node("Publicaciones",
+                titulo_publicacion= titulo_publicacion,
+                nombre_revista= nombre_revista,
+                anno_publicacion= anno_publicacion)
+    crear_nodo(nodo)
+    return nodo
+
+def procesar_relaciones(df):
+    driver = GraphDatabase.driver(uri=URI, auth=AUTH)
+    try:
+        with driver.session() as session:
+            for index, row in df.iterrows(): 
+                query = f"MATCH (i:Investigadores {{id: {row['idInv']}}}), (p:Proyectos {{idPry: {row['idProy']}}}) MERGE (i)-[:PARTICIPA_EN]->(p)"
+                session.run(query)
+    except Exception as e:
+        st.error(f"Error al procesar las relaciones: {e}")
+
+
+
+def procesar_relaciones_PUB_PRO(df):
+    driver = GraphDatabase.driver(uri=URI, auth=AUTH)
+    try:
+        with driver.session() as session:
+            for index, row in df.iterrows():
+                query = f"MATCH (p:Proyectos {{idPry: {row['idProyecto']}}}), (a:Publicaciones {{idPub: {row['idArt']}}}) MERGE (p)-[:PERTENECE_A]->(a)"
+                session.run(query)
+    except Exception as e:
+        st.error(f"Error al procesar las relaciones: {e}")
+
+
+
+
+
+
+def procesar_archivos(df, tipo_nodo):
+    driver = GraphDatabase.driver(uri=URI, auth=AUTH)
+    try:
+        with driver.session() as session:
+            for index, row in df.iterrows():
+                if tipo_nodo == "Investigadores":
+                    query = f"CREATE (n:Investigadores {{id: {row['id']}, nombre_completo: '{row['nombre_completo']}', titulo_academico: '{row['titulo_academico']}', institucion: '{row['institucion']}', email: '{row['email']}'}})"
+                elif tipo_nodo == "Proyectos":
+                    query = f"CREATE (n:Proyectos {{idPry: {row['idPry']}, titulo_proyecto: '{row['titulo_proyecto']}', anno_inicio: {row['anno_inicio']}, duracion_meses: {row['duracion_meses']}, area_conocimiento: '{row['area_conocimiento']}'}})"
+                elif tipo_nodo == "Publicaciones":
+                    query = f"CREATE (n:Publicaciones {{idPub: {row['idPub']}, titulo_publicacion: '{row['titulo_publicacion']}', anno_publicacion: {row['anno_publicacion']}, nombre_revista: '{row['nombre_revista']}'}})"
+                
+                session.run(query)
+    except Exception as e:
+        st.error(f"Error al procesar los nodos de tipo {tipo_nodo}: {e}")
+        
+
+
+def existe_nodo(tipo):
+    driver = GraphDatabase.driver(uri=URI, auth=AUTH)
+    with driver.session() as session:
+        resultado = session.run(f"MATCH (n:{tipo}) RETURN n LIMIT 1")
+        return resultado.single() is not None
