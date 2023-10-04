@@ -164,48 +164,45 @@ def main():
             # Consulta 6
 
             if (opcionInicio=="Buscar Publicacion"):
-                    st.title('Búsqueda de una Publicación')
-                    relacion_plu_pry=recuperar_relaciones_proyectos_publicaciones()
-                    df_relacion_plu_pry= pd.DataFrame(relacion_plu_pry)
-                    # Crear un DataFrame para las relaciones entre proyectos y publicaciones
-                    data = []
-                    for item in relacion_plu_pry:
-                        publicacion = item['publicacion']
-                        proyecto = item['proyecto']
-                        data.append({
-                            'idPub': publicacion['idPub'],
-                            'idPry': proyecto['idPry'],
-                            'titulo_publicacion': publicacion['titulo_publicacion'],
-                            'fecha_publicacion': publicacion['fecha_publicacion'],
-                            'resumen': publicacion['resumen'],
-                            'palabras_clave': publicacion['palabras_clave'],
-                            'titulo_proyecto': proyecto['titulo_proyecto'],
-                            'anno_inicio': proyecto['anno_inicio'],
-                            'area_conocimiento': proyecto['area_conocimiento'],
-                            'duracion_meses': proyecto['duracion_meses'],
-                        })
+                st.title('Búsqueda de una Publicación')
 
-                    df_relacion_plu_pry = pd.DataFrame(data)
+                # Crear un widget de selección con los títulos de las publicaciones
+                selected_publications = st.selectbox(
+                    'Selecciona un artículo:',
+                    df_publicacion.apply(lambda row: (row['idPub'], row['titulo_publicacion']), axis=1)
+                )[0]
+                
+                relacion_plu_pry = recuperar_relaciones_proyectos_publicaciones(selected_publications)
+                
+                # Convertir la lista de diccionarios en un DataFrame
+                df_relacion_plu_pry = pd.DataFrame(relacion_plu_pry)
+                if relacion_plu_pry==[]:
+                    
+                    # Extraer la información de las publicaciones y los proyectos en diferentes DataFrames
+                    df_publicacion_selected = df_publicacion[df_publicacion['idPub'] == selected_publications]
+                    
+                    # Mostrar la información en Streamlit
+                    st.subheader('Información de la Publicación')
+                    st.table(df_publicacion_selected)
+                    st.warning('La publicación seleccionada no tiene proyectos asociados.')
+                else: 
+                    # Extraer la información de las publicaciones y los proyectos en diferentes DataFrames
+                    df_publicaciones = df_relacion_plu_pry['publicacion'].apply(pd.Series).drop_duplicates().reset_index(drop=True)
+                    
+                    # Mostrar la información en Streamlit
+                    st.subheader('Información de la Publicación')
+                    st.table(df_publicaciones)
+                    
+                    # Verificar si hay proyectos asociados
+                    if not df_relacion_plu_pry.empty:
+                        df_proyectos = df_relacion_plu_pry['proyecto'].apply(pd.Series)
+                        st.subheader('Proyectos Asociados')
+                        st.table(df_proyectos)
+                    else:
+                        st.warning('La publicación seleccionada no tiene proyectos asociados.')
 
-                    # Crear un widget de selección con los títulos de las publicaciones
-                    selected_publications = st.multiselect('Selecciona una o más publicaciones:', df_publicacion['titulo_publicacion'].tolist())
 
-                    for selected_publication in selected_publications:
-                        # Filtrar el DataFrame de publicaciones basado en la selección del usuario
-                        selected_publication_data = df_publicacion[df_publicacion['titulo_publicacion'] == selected_publication]
-
-                        # Mostrar los datos de la publicación seleccionada
-                        st.subheader('Datos de la Publicación Seleccionada')
-                        st.write(selected_publication_data)
-
-                        if not df_relacion_plu_pry.empty:
-                            # Obtener y mostrar los proyectos asociados a la publicación seleccionada
-                            st.subheader('Proyecto Asociado')
-                            proyectos_ids = df_relacion_plu_pry[df_relacion_plu_pry['idPub'] == selected_publication_data.iloc[0]['idPub']]['idPry'].tolist()
-                            proyectos_asociados = df_proyecto[df_proyecto['idPry'].isin(proyectos_ids)]
-                            st.write(proyectos_asociados)
-                        else:
-                            st.warning('No hay proyectos asociados a esta publicación.')
+                    
 
             # Consulta 7
 
@@ -513,7 +510,7 @@ def main():
                     # Crear un widget de selección con los nombres de los investigadores
                     selected_publicacion = st.selectbox(
                         'Selecciona un artículo:',
-                        df_publicacion.apply(lambda row: (row['idPub'], row['nombre_revista']), axis=1)
+                        df_publicacion.apply(lambda row: (row['idPub'], row['titulo_publicacion']), axis=1)
                     )[0]  
                     
                     # Crear un widget de selección múltiple con los nombres de los proyectos, pero retornando los ids
@@ -522,12 +519,16 @@ def main():
                         df_proyectos.apply(lambda row: (row['idPry'], row['titulo_proyecto']), axis=1)
                     )
                     if st.button("Asociar"):
-                        if not selected_proyectos:
-                            st.warning("Por favor, selecciona al menos un proyecto.")
+                        validador=recuperar_relaciones_proyectos_publicaciones(selected_publicacion)
+                        if validador==[]:
+                            if not selected_proyectos:
+                                st.warning("Por favor, selecciona al menos un proyecto.")
+                            else:
+                                # Asociar el investigador seleccionado con los proyectos seleccionados
+                                asociar_publicacion_proyectos(selected_publicacion, selected_proyectos)  # Deberías implementar esta función
+                                st.success(f"El artículo {selected_publicacion} ha sido asociado correctamente a los proyectos seleccionados.")
                         else:
-                            # Asociar el investigador seleccionado con los proyectos seleccionados
-                            asociar_publicacion_proyectos(selected_publicacion, selected_proyectos)  # Deberías implementar esta función
-                            st.success(f"El artículo {selected_publicacion} ha sido asociado correctamente a los proyectos seleccionados.")
+                            st.warning("El articulo seleccionado ya está asociado a un proyecto, por favor seleccione otro.")
     else:
         st.error('No todos los tipos de nodos requeridos existen en la base de datos.')                
 

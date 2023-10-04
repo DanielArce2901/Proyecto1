@@ -240,14 +240,20 @@ def recuperar_relaciones_proyectos_investigadores():
     
     
     
-def recuperar_relaciones_proyectos_publicaciones():
+def recuperar_relaciones_proyectos_publicaciones(id_publicacion):
+    # Asumiendo que URI y AUTH son variables globales o están definidas en otro lugar del código
     graph = Graph(URI, auth=AUTH)
+    
     query = """
-    MATCH (i:Publicaciones)-[r:PERTENECE_A]->(p:Proyectos)
-    RETURN i as publicacion, r as relacion, p as proyecto
+    MATCH (i:Proyectos)-[r:PERTENECE_A]->(p:Publicaciones)
+    WHERE p.idPub = $id_publicacion
+    RETURN p as publicacion, r as relacion, i as proyecto
     """
+    
     try:
-        resultados = graph.run(query).data()
+        # Ejecutando la consulta con parámetros
+        resultados = graph.run(query, id_publicacion=id_publicacion).data()
+        
         relaciones = []
         for resultado in resultados:
             publicacion = resultado.get('publicacion', {})
@@ -262,6 +268,7 @@ def recuperar_relaciones_proyectos_publicaciones():
     except Exception as e:
         print(f"Error al recuperar relaciones: {e}")
         return []  # Retorna una lista vacía en caso de error
+
     
     
 def asociar_investigador_proyectos(selected_investigador, selected_proyectos):
@@ -291,7 +298,7 @@ def asociar_investigador_proyectos(selected_investigador, selected_proyectos):
                 continue
             
             # Crear la relación entre el investigador y el proyecto
-            graph.create(Relationship(investigador, "PARTICIPA_EN", proyecto))
+            graph.create(Relationship(investigador, "PARTICIPA_EN",proyecto ))
             print(f"Relación creada con éxito entre Investigador {idInv} y Proyecto {idProy}")
         
         except ValueError:
@@ -327,7 +334,7 @@ def asociar_publicacion_proyectos(selected_publicacion, selected_proyectos):
                 continue
             
             # Crear la relación entre el investigador y el proyecto
-            graph.create(Relationship(investigador, "PERTENECE_A", proyecto))
+            graph.create(Relationship(proyecto, "PERTENECE_A", investigador))
             print(f"Relación creada con éxito entre artículo {idInv} y Proyecto {idProy}")
         
         except ValueError:
@@ -503,3 +510,14 @@ def existe_nodo(tipo):
     with driver.session() as session:
         resultado = session.run(f"MATCH (n:{tipo}) RETURN n LIMIT 1")
         return resultado.single() is not None
+
+
+
+def obtener_titulos_publicaciones(relaciones):
+    return [relacion['publicacion']['titulo'] for relacion in relaciones]
+
+def obtener_datos_publicacion(titulo, relaciones):
+    for relacion in relaciones:
+        if relacion['publicacion']['titulo'] == titulo:
+            return relacion
+    return None
