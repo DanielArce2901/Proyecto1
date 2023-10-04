@@ -299,7 +299,7 @@ def main():
                         'titulo_publicacion': 'Titulo de publicacion',
                         'idPub': 'ID de la publicacion'
                     }, inplace=True)
-                    st.title('Lista de Proyectos')
+                    st.title('Lista de Publicaciones')
                     st.table(df_publicaciones)
 
                 
@@ -334,9 +334,10 @@ def main():
                             investigador_data = {
                                 "nombre_completo": st.text_input("Nuevo nombre completo del investigador:"),
                                 "titulo_academico": st.text_input("Nuevo título académico:"),
+                                "institucion": st.text_input("Nueva institución del investigador:"),
                                 "email": st.text_input("Nuevo email del investigador:")
                             }
-                            if investigador_data["nombre_completo"] and investigador_data["titulo_academico"] and investigador_data["email"]:
+                            if investigador_data["nombre_completo"] and investigador_data["titulo_academico"]and investigador_data["institucion"] and investigador_data["email"]:
                                 if st.button("Actualizar Investigador"):
                                     actualizar_investigador(idInv, investigador_data)
                                     st.success("Investigador actualizado exitosamente.")
