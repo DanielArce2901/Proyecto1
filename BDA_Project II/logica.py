@@ -30,7 +30,7 @@ if opcion == "Registro de Colaborador":
     transporte = st.checkbox("Requiere Transporte")
     if st.button("Registrar Solicitud"):
         print ("Aún no hay nada, es solo para cerrar el if")
-        # Aquí implementarás la lógica para guardar la solicitud en la base de datos (puedes hacerlo más tarde).
+        # Eddy, Chule o Dani aquí ponen la lógica para guardar la solicitud en la base de datos.
 elif opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Inicio de Sesión - Personal Administrativo")
     
@@ -40,33 +40,33 @@ elif opcion == "Inicio de Sesión (Personal Administrativo)":
     
     if st.button("Iniciar Sesión"):
         print ("Aún no hay nada, es solo para cerrar el if")
-        # Aquí implementarás la lógica de autenticación del personal administrativo (puedes hacerlo más tarde).
+        # Eddy, Chule o Dani aquí ponen la lógica de autenticación del personal administrativo.
 # Página para colaboradores ver historial de solicitudes (simulado)
 if opcion == "Registro de Colaborador":
     st.header("Historial de Solicitudes de Colaborador")
-    # Aquí mostrarás el historial de solicitudes del colaborador (simulado).
+    # Eddy, Chule o Dani aquí muestran el historial de solicitudes del colaborador (simulado).
 
 # Página para personal administrativo para ver solicitudes pendientes (simulado)
 if opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Solicitudes Pendientes (Personal Administrativo)")
-    # Aquí mostrarás la lista de solicitudes pendientes (simulado).
+    # Eddy, Chule o Dani aquí muestran la lista de solicitudes pendientes (simulado).
 
 # Página para personal administrativo para valorar solicitudes (simulado)
 if opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Valorar Solicitud (Personal Administrativo)")
-    # Aquí permitirás al personal administrativo valorar las solicitudes (simulado).
+    # Aquí permiten al personal administrativo valorar las solicitudes (simulado).
 
 # Página para personal administrativo para consultar viajes programados (simulado)
 if opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Consultar Viajes Programados (Personal Administrativo)")
-    # Aquí permitirás al personal administrativo consultar viajes programados (simulado).
+    # Aquí permiten al personal administrativo consultar viajes programados (simulado).
 
 # Página para personal administrativo para consultar viajes internacionales (simulado)
 if opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Consultar Viajes Internacionales (Personal Administrativo)")
-    # Aquí permitirás al personal administrativo consultar viajes internacionales (simulado).
+    # Aquí permiten al personal administrativo consultar viajes internacionales (simulado).
 
 # Página para personal administrativo para consultar por destino específico (simulado)
 if opcion == "Inicio de Sesión (Personal Administrativo)":
     st.header("Consultar por Destino Específico (Personal Administrativo)")
-    # Aquí permitirás al personal administrativo consultar por destino específico (simulado).
+    # Aquí permieten al personal administrativo consultar por destino específico (simulado).
